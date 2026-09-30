@@ -24,4 +24,4 @@ This initial version is a single-owner editor using HTTP Basic auth. It fails cl
 
 ## Future work
 
-Automated deployment from a publish action, durable browser draft recovery after a browser crash, richer attachment conversion, publication timestamps, redirects for intentional slug changes, and deployment-specific off-host backups are follow-up work. Five-second autosave and before-unload protection are implemented; unsaved keystrokes can still be lost if a tab crashes before saving.
+Automated deployment from a publish action, durable browser draft recovery after a browser crash, richer attachment conversion, publication timestamps, redirects for intentional slug changes, and automated retention policies are follow-up work. Static Vercel release scripts and verified rclone offsite backups are available in the operations guide. Five-second autosave and before-unload protection are implemented; unsaved keystrokes can still be lost if a tab crashes before saving.

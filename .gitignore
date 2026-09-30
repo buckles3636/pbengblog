@@ -9,3 +9,7 @@ out/
 playwright-report/
 test-results/
 apps/web/public/media/
+
+__pycache__/
+*.pyc
+.vercel/

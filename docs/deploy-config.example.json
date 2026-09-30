@@ -1,0 +1,6 @@
+{
+  "projectId": "prj_YOUR_PROJECT_ID",
+  "projectName": "your-blog",
+  "teamId": "team_YOUR_TEAM_ID",
+  "tokenFile": "/absolute/path/to/private/vercel-token"
+}

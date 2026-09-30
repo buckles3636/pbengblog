@@ -17,7 +17,7 @@ Example photos: Antti Leppänen, Cjp24, and Tony Webster. See [photo sources and
 - **Website:** A separate Next.js static export. Publishing copies only published articles and their images into an immutable release; readers never connect to your database or editor.
 - **Migration:** A one-time importer for public `nextjs-notion-starter-kit` sites. The running blog has no Notion dependency.
 
-This is an early working foundation. The editor currently requires a separate export/build step after publishing. There is no automatic production deployment, multi-user management, or public editor hosting configuration.
+This is an early working foundation. The editor currently requires a separate export/build step after publishing. The included release command prepares and deploys published snapshots to Vercel. There is no multi-user management or public editor hosting configuration.
 
 ## Start locally
 
@@ -51,7 +51,7 @@ Drafts autosave every five seconds. Saves use optimistic version checks to preve
 2. Choose **Publish snapshot** to save its published version in PostgreSQL.
 3. Run `npm run publish` to export published content and checksum-verified media to `.local/releases/`.
 4. Run `npm run build:published` to create `apps/web/out/`.
-5. Review and deploy that output to your static host, such as Vercel.
+5. Review and deploy that output to your static host. For the complete Vercel flow, configure `.local/deploy-config.json` as described in [operations](docs/OPERATIONS.md), then use `bash scripts/release.sh --production`.
 
 A normal `npm run build --workspace @pbengblog/web` builds the generic demo. It never reads private drafts. An explicit empty published snapshot builds an empty website.
 

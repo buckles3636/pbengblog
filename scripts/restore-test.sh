@@ -22,6 +22,6 @@ while read -r expected filename; do
   [[ "${actual%% *}" == "$expected" ]] || { printf 'Media checksum mismatch: %s
 ' "$filename" >&2; exit 1; }
 done < "$restore_dir/media-checksums"
-docker compose exec -T db sh -c 'psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$1" -c "SELECT (SELECT count(*) FROM posts) AS posts, (SELECT count(*) FROM revisions) AS revisions, (SELECT count(*) FROM media) AS media"' sh "$test_db"
+docker compose exec -T db sh -c 'psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$1" -c "SELECT (SELECT count(*) FROM posts) AS posts, (SELECT count(*) FROM revisions) AS revisions, (SELECT count(*) FROM media) AS media, (SELECT count(*) FROM tags) AS tags, (SELECT count(*) FROM post_tags) AS post_tags"' sh "$test_db"
 printf 'Restore verified in an isolated database; live database unchanged.
 '

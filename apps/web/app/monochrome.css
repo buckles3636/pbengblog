@@ -214,7 +214,6 @@ header.site-header {
   object-fit: cover;
   border-radius: 0;
   margin: 0;
-  filter: grayscale(1);
   transition: transform 0.3s;
 }
 .card:hover img {
