@@ -1,4 +1,5 @@
 import "../../../shared/theme.css";
+import "./editor.css";
 import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "PBEngBlog · Editor",

@@ -20,7 +20,13 @@ The static build consumes an explicit snapshot path. No credentials, database cl
 
 ## Authentication and trust boundary
 
-This initial version is a single-owner editor using HTTP Basic auth. It fails closed if credentials are missing or too short. Every route is protected; write endpoints additionally require the same Origin. JSON bodies and uploads have streaming size limits. SVG/HTML uploads and executable URLs are rejected. The database and editor bind to loopback. Use an SSH tunnel or trusted HTTPS reverse proxy; this scaffold is not configured as a public multi-user service.
+The editor uses a single-owner login page and opaque random session cookies. Migration `004_editor_sessions.sql` adds sessions and login throttles to the existing PostgreSQL database. Session tokens are stored as keyed hashes, expire after 12 hours, and are revoked on logout. Credential or session-key changes invalidate existing sessions. HTTPS cookies are host-only, Secure, HttpOnly, and SameSite=Strict. Empty/unconfigured credentials fail closed; the password has no minimum length. Use a strong owner-selected password and an independent random session key.
+
+Every article, tag, revision, publish, and upload endpoint validates its session. Write endpoints, login, and logout also require the explicitly configured `EDITOR_ORIGIN`. Authentication failures preserve the open draft and provide a sign-in link for another tab. Draft and media responses use `private, no-store`; the editor is excluded from indexing and framing. JSON bodies and uploads have streaming size limits. SVG/HTML uploads and executable URLs are rejected.
+
+Login limits persist across restarts and serialize concurrent attempts in PostgreSQL: 10 attempts per client in a five-minute window and 100 globally. Client IPs are keyed hashes, not raw addresses. The Vercel routing deployment strips caller-supplied `x-vercel-forwarded-for` and `x-real-ip` before Vercel regenerates them. This was verified with forged headers through the actual tunnel. The regenerated client-IP header is trusted only when an independent proxy key authenticates the request; direct mode shares one client bucket. These caps can temporarily block legitimate new logins during sustained abuse; existing sessions remain usable. Expired rate-limit rows are pruned on login.
+
+The editor and database bind to loopback. Optional Vercel routing uses a separate routing-only project and an HTTPS upstream tunnel. An encrypted Vercel variable supplies the proxy key; direct access to the upstream cannot reach the editor without it. The public static site and its deployments remain independent. This is a single-owner editor, with no registration or multi-user account model.
 
 ## Future work
 

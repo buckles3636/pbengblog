@@ -5,7 +5,7 @@ import { apiError } from "../../../api-error";
 import { z } from "zod";
 import { tagNameSchema } from "../../../../../shared/content";
 export async function GET(request: Request) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   try {
     return Response.json(await listTags());
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   }
 }
 export async function POST(request: Request) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   try {
     const input = z

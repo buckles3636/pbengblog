@@ -118,6 +118,18 @@ export default function Workspace() {
       window.removeEventListener("beforeunload", before);
     };
   }, []);
+  async function logout() {
+    if (dirty.current) {
+      await save();
+      if (dirty.current) return;
+    }
+    try {
+      await api("/api/auth/logout", "POST");
+      window.location.assign("/login");
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
   async function create() {
     setBusy(true);
     try {
@@ -163,13 +175,21 @@ export default function Workspace() {
     <>
       <div className="toolbar">
         <span className="eyebrow">Your workspace</span>
+        <button onClick={logout} disabled={busy}>
+          Sign out
+        </button>
         <span className="status" role="status">
           {status}
         </span>
       </div>
       {error && (
         <p className="error" role="alert">
-          {error}
+          {error}{" "}
+          {error.includes("Session expired") && (
+            <a href="/login" target="_blank" rel="noopener noreferrer">
+              Open sign in
+            </a>
+          )}
         </p>
       )}
       <div className="editor-layout">

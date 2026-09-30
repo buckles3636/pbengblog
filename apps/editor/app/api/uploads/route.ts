@@ -3,7 +3,7 @@ import { readBody, HttpError } from "../../../../../lib/http";
 import { storeImage } from "../../../../../lib/media";
 import { apiError } from "../../../api-error";
 export async function POST(request: Request) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   try {
     const bytes = await readBody(request, 13 * 1024 * 1024);

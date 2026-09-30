@@ -8,7 +8,7 @@ export async function PUT(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   try {
     const id = z.uuid().parse((await context.params).id);

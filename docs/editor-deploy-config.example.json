@@ -1,0 +1,8 @@
+{
+  "projectName": "your-blog-editor",
+  "teamId": "team_YOUR_TEAM_ID",
+  "tokenFile": "/absolute/path/to/private/vercel-token",
+  "proxyKeyFile": "/absolute/path/to/private/editor-proxy-key",
+  "domain": "edit.example.com",
+  "origin": "https://your-server.example/editor-upstream"
+}

@@ -2,20 +2,27 @@ import { test, expect } from "@playwright/test";
 import { config } from "dotenv";
 import { db } from "../lib/db";
 config({ quiet: true });
-test.use({
-  httpCredentials: {
-    username: process.env.EDITOR_USERNAME!,
-    password: process.env.EDITOR_PASSWORD!,
-  },
+const origin = process.env.EDITOR_ORIGIN || "http://localhost:3011";
+test.beforeEach(async ({ page }) => {
+  await page.goto(`${origin}/login`);
+  await page
+    .getByLabel("Username", { exact: true })
+    .fill(process.env.EDITOR_USERNAME!);
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill(process.env.EDITOR_PASSWORD!);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Sign out", exact: true }),
+  ).toBeVisible();
 });
 test("editor saves headings and equations, pastes images, and recovers revisions", async ({
   page,
-  request,
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  const response = await request.post("http://127.0.0.1:3011/api/posts", {
-    headers: { Origin: "http://127.0.0.1:3011" },
+  const response = await page.request.post(`${origin}/api/posts`, {
+    headers: { Origin: origin },
     data: {
       title: "Browser test draft",
       slug: `browser-test-${Date.now()}`,
@@ -41,7 +48,7 @@ test("editor saves headings and equations, pastes images, and recovers revisions
   expect(response.status()).toBe(201);
   const post = await response.json();
   try {
-    await page.goto("http://127.0.0.1:3011/");
+    await page.goto(`${origin}/`);
     await expect(
       page.getByRole("textbox", { name: "Article title" }),
     ).toHaveValue("Browser test draft");
@@ -95,6 +102,16 @@ test("editor saves headings and equations, pastes images, and recovers revisions
       path: ".local/editor-browser-check.png",
       fullPage: true,
     });
+    await page
+      .getByRole("textbox", { name: "Article title" })
+      .fill("Saved on sign out");
+    await page.getByRole("button", { name: "Sign out", exact: true }).click();
+    await page.waitForURL("**/login");
+    expect(
+      (await db().query("SELECT title FROM posts WHERE id=$1", [post.id]))
+        .rows[0].title,
+    ).toBe("Saved on sign out");
+    expect((await page.request.get(`${origin}/api/posts`)).status()).toBe(401);
     expect(errors).toEqual([]);
   } finally {
     await db().query("DELETE FROM posts WHERE id=$1", [post.id]);

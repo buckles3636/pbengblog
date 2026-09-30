@@ -3,7 +3,7 @@ import { guard } from "../../../../../lib/auth";
 import { createPost, listPosts } from "../../../../../lib/posts";
 import { apiError } from "../../../api-error";
 export async function GET(request: Request) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   try {
     return Response.json(await listPosts());
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   }
 }
 export async function POST(request: Request) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   try {
     return Response.json(await createPost(await readJson(request)), {

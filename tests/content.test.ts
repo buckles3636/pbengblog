@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 import { draftSchema, safeUrl, headings } from "../shared/content";
 import { demo } from "../shared/demo";
 import { imageType } from "../lib/media";
-import { guard } from "../lib/auth";
+import {
+  credentialsMatch,
+  sameOrigin,
+  sessionCookie,
+  sessionToken,
+} from "../lib/auth";
 import { readBody } from "../lib/http";
 test("content accepts equations and nested headings", () => {
   assert.equal(draftSchema.parse(demo).blocks.length, demo.blocks.length);
@@ -69,39 +74,64 @@ test("request body limits apply even without Content-Length", async () => {
     /too large/,
   );
 });
-test("writes need authentication and the correct Origin", () => {
+test("credentials accept an owner-selected password and reject invalid input", () => {
   const user = process.env.EDITOR_USERNAME,
     password = process.env.EDITOR_PASSWORD;
   process.env.EDITOR_USERNAME = "test";
-  process.env.EDITOR_PASSWORD = "a-long-test-only-password-123";
-  const authorization = `Basic ${Buffer.from("test:a-long-test-only-password-123").toString("base64")}`;
+  process.env.EDITOR_PASSWORD = "test-pass!";
   try {
-    assert.equal(
-      guard(new Request("http://localhost:3011/api/posts"))?.status,
-      401,
-    );
-    assert.equal(
-      guard(
-        new Request("http://localhost:3011/api/posts", {
-          method: "POST",
-          headers: { authorization, origin: "https://evil.test" },
-        }),
-      )?.status,
-      403,
-    );
-    assert.equal(
-      guard(
-        new Request("http://localhost:3011/api/posts", {
-          method: "POST",
-          headers: { authorization, origin: "http://localhost:3011" },
-        }),
-      ),
-      undefined,
-    );
+    assert.equal(credentialsMatch("test", "test-pass!"), true);
+    assert.equal(credentialsMatch("test", "wrong"), false);
+    assert.equal(credentialsMatch("wrong", "test-pass!"), false);
+    assert.equal(credentialsMatch(null, {}), false);
+    process.env.EDITOR_PASSWORD = "";
+    assert.equal(credentialsMatch("test", ""), false);
   } finally {
     if (user === undefined) delete process.env.EDITOR_USERNAME;
     else process.env.EDITOR_USERNAME = user;
     if (password === undefined) delete process.env.EDITOR_PASSWORD;
     else process.env.EDITOR_PASSWORD = password;
+  }
+});
+test("origin checks and HTTPS cookie protections cannot use forwarded headers", () => {
+  const origin = process.env.EDITOR_ORIGIN;
+  process.env.EDITOR_ORIGIN = "https://editor.example.com";
+  try {
+    assert.equal(
+      sameOrigin(
+        new Request("http://localhost", {
+          headers: { origin: "https://editor.example.com" },
+        }),
+      ),
+      true,
+    );
+    assert.equal(
+      sameOrigin(
+        new Request("http://localhost", {
+          headers: {
+            origin: "https://evil.test",
+            "x-forwarded-host": "evil.test",
+          },
+        }),
+      ),
+      false,
+    );
+    assert.equal(sameOrigin(new Request("http://localhost")), false);
+    assert.match(
+      sessionCookie("x"),
+      /__Host-pb-session=x; Path=\/; HttpOnly; SameSite=Strict; Max-Age=43200; Secure/,
+    );
+    assert.match(sessionCookie("", true), /Max-Age=0; Secure/);
+    assert.equal(
+      sessionToken(
+        new Request("http://localhost", {
+          headers: { cookie: "__Host-pb-session=invalid" },
+        }),
+      ),
+      undefined,
+    );
+  } finally {
+    if (origin === undefined) delete process.env.EDITOR_ORIGIN;
+    else process.env.EDITOR_ORIGIN = origin;
   }
 });

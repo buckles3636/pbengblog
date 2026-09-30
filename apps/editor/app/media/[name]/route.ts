@@ -6,7 +6,7 @@ export async function GET(
   request: Request,
   context: { params: Promise<{ name: string }> },
 ) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   const { name } = await context.params;
   if (!/^[a-f0-9-]+\.(png|jpg|jpeg|webp|gif)$/.test(name))
@@ -19,7 +19,7 @@ export async function GET(
         "Content-Type":
           ext === "jpg" || ext === "jpeg" ? "image/jpeg" : `image/${ext}`,
         "X-Content-Type-Options": "nosniff",
-        "Cache-Control": "private, max-age=3600",
+        "Cache-Control": "private, no-store",
       },
     });
   } catch {

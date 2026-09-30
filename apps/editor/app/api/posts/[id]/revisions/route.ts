@@ -6,7 +6,7 @@ export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   try {
     const { id } = await context.params;

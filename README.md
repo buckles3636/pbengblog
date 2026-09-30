@@ -73,3 +73,10 @@ The database integration test creates uniquely named temporary posts and removes
 ## License
 
 PBEngBlog application code is MIT licensed. Dependencies retain their own licenses; BlockNote core and its math package are MPL-2.0. No XL packages are required. Imported articles and media are not covered by the code license.
+
+
+## Editor login
+
+The self-hosted editor includes a login page, 12-hour sessions, and persistent login throttling. Configure your own credentials and session key, run migrations, and open `/login`. Optional HTTPS-domain deployment and continuous Docker hosting are covered in [Operations](docs/OPERATIONS.md#editor-login-and-continuous-hosting).
+
+![PBEngBlog editor login page](docs/images/editor-login.png)
