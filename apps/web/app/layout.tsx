@@ -33,7 +33,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <span>
             © {new Date().getFullYear()} {site.author}
           </span>
-          <span>Built with PBEngBlog / An open engineering notebook</span>
+          <span>
+            Built with PBEngBlog /{" "}
+            <a href="/demo/PHOTO-CREDITS.txt">Photo credits</a>
+          </span>
         </footer>
       </body>
     </html>

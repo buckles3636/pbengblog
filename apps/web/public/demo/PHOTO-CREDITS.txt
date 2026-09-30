@@ -1,0 +1,28 @@
+PBEngBlog example photography
+
+These photographs illustrate related real equipment; the three project writeups
+are fictional. The photographers and equipment makers do not endorse this site.
+Photos retain the licenses below and are not covered by the application MIT license.
+Downloaded from Wikimedia Commons on 2026-09-30 and hosted locally.
+Homepage photos are cropped and displayed in grayscale using CSS; article photos
+retain their original colors. README screenshots reproduce these presentations.
+Any adaptations of the chamber photograph remain under CC BY-SA 3.0.
+
+1. torque-sensor.jpg — Artic tram motor test stand
+Photographer: Antti Leppänen
+Source: https://commons.wikimedia.org/wiki/File:Artic_tram_motor_test_stand.jpg
+License: Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+
+2. thermal-chamber.jpg — Environmental chamber-open
+Photographer: Cjp24
+Source: https://commons.wikimedia.org/wiki/File:Environmental_chamber-open.jpg
+License: Creative Commons Attribution-ShareAlike 3.0 Unported
+https://creativecommons.org/licenses/by-sa/3.0/
+
+3. camera-slider.jpg — Rhino Camera Gear - ROV PRO Traveler Camera Slider
+Photographer: Tony Webster
+Source: https://commons.wikimedia.org/wiki/File:Rhino_Camera_Gear_-_ROV_PRO_Traveler_Camera_Slider_(45718556114).jpg
+Original source: https://www.flickr.com/photos/diversey/45718556114/
+License: Creative Commons Attribution 2.0 Generic
+https://creativecommons.org/licenses/by/2.0/

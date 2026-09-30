@@ -8,6 +8,8 @@ The template includes three clearly labeled fictional projects: a torque sensor,
 
 ![PBEngBlog homepage with a black-and-white engineering theme and three fictional projects](docs/images/homepage.png)
 
+Example photos: Antti Leppänen, Cjp24, and Tony Webster. See [photo sources and licenses](apps/web/public/demo/PHOTO-CREDITS.txt), including credits for the screenshot above.
+
 ## Architecture
 
 - **Editor:** Next.js and BlockNote, protected by single-user HTTP Basic authentication. Run privately behind HTTPS or an SSH tunnel.

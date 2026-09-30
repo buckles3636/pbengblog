@@ -18,7 +18,7 @@ export const demos: Article[] = [
     summary:
       "A fictional design study in strain measurement, calibration, and a simple mechanical load path.",
     category: "Fictional demo · Instrumentation",
-    cover: "/demo/torque-sensor.svg",
+    cover: "/demo/torque-sensor.jpg",
     version: 1,
     updatedAt: "2026-09-01T00:00:00.000Z",
     blocks: [
@@ -35,9 +35,9 @@ export const demos: Article[] = [
         id: "diagram",
         type: "image",
         props: {
-          url: "/demo/torque-sensor.svg",
+          url: "/demo/torque-sensor.jpg",
           caption:
-            "Illustrative arrangement of the motor, lever arm, and load cell.",
+            "Reference photo: Artic tram motor on a stand, by Antti Leppänen (CC BY 4.0). The fictional sensor project is not pictured.",
         },
       },
       heading("math", "Show your work"),
@@ -60,7 +60,7 @@ export const demos: Article[] = [
     summary:
       "An invented notebook entry exploring insulation, temperature sensing, and a repeatable test procedure.",
     category: "Fictional demo · Test equipment",
-    cover: "/demo/thermal-chamber.svg",
+    cover: "/demo/thermal-chamber.jpg",
     version: 1,
     updatedAt: "2026-08-15T00:00:00.000Z",
     blocks: [
@@ -77,8 +77,9 @@ export const demos: Article[] = [
         id: "chamber",
         type: "image",
         props: {
-          url: "/demo/thermal-chamber.svg",
-          caption: "Concept sketch, not a fabrication drawing.",
+          url: "/demo/thermal-chamber.jpg",
+          caption:
+            "Reference photo: Weiss heat/cold test chamber, by Cjp24 (CC BY-SA 3.0). The fictional chamber project is not pictured.",
         },
       },
       heading("model", "A first-order model"),
@@ -105,7 +106,7 @@ export const demos: Article[] = [
     summary:
       "A fictional motion-control project covering drive ratios, homing, and a clear record of design tradeoffs.",
     category: "Fictional demo · Mechanisms",
-    cover: "/demo/camera-slider.svg",
+    cover: "/demo/camera-slider.jpg",
     version: 1,
     updatedAt: "2026-07-20T00:00:00.000Z",
     blocks: [
@@ -122,8 +123,9 @@ export const demos: Article[] = [
         id: "slider",
         type: "image",
         props: {
-          url: "/demo/camera-slider.svg",
-          caption: "Illustrative belt-driven carriage.",
+          url: "/demo/camera-slider.jpg",
+          caption:
+            "Reference photo: Rhino RŌV PRO Traveler camera slider, by Tony Webster (CC BY 2.0). The fictional slider project is not pictured.",
         },
       },
       heading("resolution", "Command resolution"),
