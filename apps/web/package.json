@@ -1,0 +1,9 @@
+{
+  "name": "@pbengblog/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 3012",
+    "build": "next build"
+  }
+}

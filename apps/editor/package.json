@@ -1,0 +1,10 @@
+{
+  "name": "@pbengblog/editor",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 3011",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1 --port 3011"
+  }
+}

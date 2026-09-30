@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+.env
+.env.*
+!.env.example
+.local/
+*.tsbuildinfo
+playwright-report/
+test-results/
+apps/web/public/media/

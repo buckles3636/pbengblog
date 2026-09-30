@@ -1,0 +1,57 @@
+{
+  "name": "pbengblog",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace @pbengblog/editor",
+    "dev:web": "npm run dev --workspace @pbengblog/web",
+    "build": "npm run build --workspaces",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p apps/editor && tsc --noEmit -p apps/web",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "publish": "tsx scripts/publish.ts",
+    "import:notion": "tsx scripts/import-notion.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "test:db": "tsx --test tests/database.integration.ts",
+    "db:backup": "bash scripts/backup.sh",
+    "db:restore-test": "bash scripts/restore-test.sh",
+    "build:published": "tsx scripts/build-published.ts",
+    "preview:export": "tsx scripts/publish.ts --preview",
+    "build:preview": "tsx scripts/build-published.ts --preview",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@blocknote/core": "0.55.0",
+    "@blocknote/mantine": "0.55.0",
+    "@blocknote/math-block": "0.55.0",
+    "@blocknote/react": "0.55.0",
+    "@mantine/core": "^8.3.11",
+    "@mantine/hooks": "^8.3.11",
+    "dotenv": "^17.2.0",
+    "katex": "^0.16.25",
+    "next": "16.3.7",
+    "pg": "^8.16.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/katex": "^0.16.7",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "prettier": "3.9.9",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  },
+  "type": "module",
+  "license": "MIT"
+}

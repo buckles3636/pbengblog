@@ -1,0 +1,21 @@
+import "../../../shared/theme.css";
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "PBEngBlog · Editor",
+  robots: { index: false, follow: false },
+};
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <header className="site-header">
+          <a className="brand" href="/">
+            <small>PB /</small>PBEngBlog
+          </a>
+          <span className="eyebrow">Private notebook</span>
+        </header>
+        <main className="shell">{children}</main>
+      </body>
+    </html>
+  );
+}
