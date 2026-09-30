@@ -452,3 +452,8 @@ h4 {
 .prose h3 {
   font-size: 1.35rem;
 }
+
+.outline a[aria-current="location"] {
+  color: var(--accent);
+  font-weight: 600;
+}

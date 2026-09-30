@@ -296,7 +296,7 @@ export default function Workspace() {
                       onChange={(blocks: Block[]) => change({ blocks })}
                     />
                   </div>
-                  <Outline blocks={post.blocks} />
+                  <Outline blocks={post.blocks} editor />
                 </div>
               )}
             </>

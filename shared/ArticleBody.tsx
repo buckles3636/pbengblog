@@ -1,3 +1,4 @@
+import HeadingOutline from "./HeadingOutline";
 import React, { type ReactNode } from "react";
 import katex from "katex";
 import {
@@ -198,21 +199,14 @@ function Nodes({ blocks }: { blocks: Block[] }) {
   });
 }
 const MathGlobal = globalThis.Math;
-export function Outline({ blocks }: { blocks: Block[] }) {
-  return (
-    <nav className="outline" aria-label="On this page">
-      <span className="eyebrow">On this page</span>
-      {headings(blocks).map((h) => (
-        <a
-          key={h.id}
-          href={`#${h.id}`}
-          style={{ paddingLeft: `${MathGlobal.max(0, h.level - 2) * 12}px` }}
-        >
-          {h.title}
-        </a>
-      ))}
-    </nav>
-  );
+export function Outline({
+  blocks,
+  editor = false,
+}: {
+  blocks: Block[];
+  editor?: boolean;
+}) {
+  return <HeadingOutline items={headings(blocks)} editor={editor} />;
 }
 export function ArticleBody({ blocks }: { blocks: Block[] }) {
   return (
