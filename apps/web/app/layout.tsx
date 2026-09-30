@@ -1,4 +1,5 @@
 import "../../../shared/theme.css";
+import "./monochrome.css";
 import { site } from "../site.config";
 import type { Metadata } from "next";
 export const metadata: Metadata = {
@@ -10,18 +11,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
         <header className="site-header">
           <a className="brand" href="/">
+            <span className="brand-mark" aria-hidden="true">
+              +
+            </span>
             {site.name}
           </a>
-          <nav>
+          <nav aria-label="Main navigation">
             <a href="/#projects">Projects</a>
             <a href="https://github.com/buckles3636/pbengblog">Source</a>
           </nav>
         </header>
-        <main className="shell">{children}</main>
+        <main id="main" className="shell">
+          {children}
+        </main>
         <footer>
-          © {new Date().getFullYear()} {site.author} · Built with PBEngBlog
+          <span>
+            © {new Date().getFullYear()} {site.author}
+          </span>
+          <span>Built with PBEngBlog / An open engineering notebook</span>
         </footer>
       </body>
     </html>

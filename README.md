@@ -2,11 +2,11 @@
 
 A self-hosted engineering blog with a Notion-style BlockNote editor, LaTeX equations, image pasting, and automatic article navigation.
 
-The template includes three clearly labeled fictional projects: a torque sensor, a thermal chamber, and a camera slider. It uses a restrained, neutral document theme. Site branding is configurable; personal content and custom themes belong in your own repository.
+The template includes three clearly labeled fictional projects: a torque sensor, a thermal chamber, and a camera slider. The website uses a bold black-and-white engineering theme with an original technical drawing, numbered project cards, and readable article layouts. The editor keeps its neutral document theme. Site branding is configurable; personal content and custom themes belong in your own repository.
 
 ## Homepage preview
 
-![PBEngBlog homepage with a neutral document theme and three fictional engineering projects](docs/images/homepage.png)
+![PBEngBlog homepage with a black-and-white engineering theme and three fictional projects](docs/images/homepage.png)
 
 ## Architecture
 
@@ -35,7 +35,7 @@ Open `http://127.0.0.1:3011` and sign in with the credentials in `.env`. The dat
 
 If Node is unavailable on Linux, `bash scripts/node.sh npm ci` and `bash scripts/node.sh npm run dev` use the existing Node Docker image with your uid/gid. The helper uses host networking to reach the loopback database.
 
-For the neutral website demo, run `npm run dev:web` and open `http://127.0.0.1:3012`.
+For the monochrome website demo, run `npm run dev:web` and open `http://127.0.0.1:3012`.
 
 ## Write and publish
 
