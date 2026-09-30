@@ -4,6 +4,10 @@ A self-hosted engineering blog with a Notion-style BlockNote editor, LaTeX equat
 
 The template includes three clearly labeled fictional projects: a torque sensor, a thermal chamber, and a camera slider. It uses a restrained, neutral document theme. Site branding is configurable; personal content and custom themes belong in your own repository.
 
+## Homepage preview
+
+![PBEngBlog homepage with a neutral document theme and three fictional engineering projects](docs/images/homepage.png)
+
 ## Architecture
 
 - **Editor:** Next.js and BlockNote, protected by single-user HTTP Basic authentication. Run privately behind HTTPS or an SSH tunnel.
