@@ -43,6 +43,8 @@ For the monochrome website demo, run `npm run dev:web` and open `http://127.0.0.
 
 Use headings and blocks; the website supplies fonts, spacing, and colors. Paste PNG, JPEG, WebP, or GIF images (up to 12 MB) directly into the editor. Use `/` to insert inline or display equations.
 
+Create reusable tags in the editor, assign several to each article, and filter the article list by tag. The public project archive has tag filters with shareable URLs. Tag names are case-insensitively unique; rename them under **Manage tags**. Renames update draft labels, while published snapshots and revision history keep their saved labels until republished or restored. Each article supports up to 30 tags.
+
 Drafts autosave every five seconds. Saves use optimistic version checks to prevent another tab from overwriting your edits. History restores a revision into the draft; saving creates a new revision. Published URLs are permanent in this version.
 
 1. Save and preview an article.

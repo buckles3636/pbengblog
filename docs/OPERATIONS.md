@@ -36,3 +36,7 @@ Back up first. Update dependency versions intentionally, run type checks and tes
 ## Private draft previews
 
 `npm run preview:export` and `npm run build:preview` produce a local static preview of drafts without publishing them. The release is marked `preview: true` and uses a separate `preview-current.json` pointer. Never deploy a draft preview publicly without reviewing its contents.
+
+## Reusable tags
+
+Migration `003_reusable_tags.sql` adds `tags` and `post_tags`; run `npm run db:migrate` before starting the updated editor. Existing posts begin with no tags and continue to work. Tag assignment and article revision writes share one transaction. Unknown tag IDs reject the entire save. Tag names are unique ignoring case; concurrent creation reuses the existing tag. Renaming uses the previous name to reject stale writes. Revisions and published snapshots carry tag IDs and names, so renaming draft tags cannot change an exported website. Database backups include the registry and assignments.

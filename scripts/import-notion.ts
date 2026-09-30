@@ -3,6 +3,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { dataDir } from "../lib/env";
 import { db } from "../lib/db";
+import { createTag } from "../lib/tags";
 import { createPost } from "../lib/posts";
 import { storeImage } from "../lib/media";
 import {
@@ -166,7 +167,11 @@ const inventory = pages
       slug: link?.slug ?? null,
       public: plain(property(p, "Public")) !== "No",
       summary: plain(property(p, "Description")),
-      category: plain(property(p, "Tags")) || "Pages",
+      category: p.parent_table === "collection" ? "Projects" : "Pages",
+      tags: plain(property(p, "Tags"))
+        .split(",")
+        .map((name: string) => name.trim())
+        .filter(Boolean),
       sourcePublished: property(p, "Published"),
       sourceCreated: p.created_time,
       sourceEdited: p.last_edited_time,
@@ -312,6 +317,9 @@ try {
         slug: entry.slug,
         summary: entry.summary.slice(0, 1000),
         category: entry.category.slice(0, 100),
+        tags: await Promise.all(
+          entry.tags.map((name: string) => createTag(name)),
+        ),
         cover,
         blocks: converted.blocks,
       });

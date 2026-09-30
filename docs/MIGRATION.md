@@ -25,3 +25,7 @@ Reruns skip existing source IDs and reuse downloaded images. A failed article is
 - Deploy to a preview first, then switch the production domain deliberately.
 
 The public template must never receive `.env`, `.local`, migration archives, database dumps, or a personal site's generated media.
+
+## Existing imports: reusable tags
+
+New imports preserve Notion Tags as reusable tags. For previously imported posts, back up the database, apply migrations, then run `npx tsx scripts/import-notion-tags.ts .local/migrations/YOUR-HOST/homepage-source.json` to preview tag assignments. Add `--apply` to create the collection’s tag options and merge assignments into existing imported drafts. The backfill is idempotent, matches only existing Notion IDs, preserves article content and categories, and does not change published snapshots. Review and republish when ready.

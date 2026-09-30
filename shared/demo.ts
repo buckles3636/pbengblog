@@ -18,6 +18,10 @@ export const demos: Article[] = [
     summary:
       "A fictional design study in strain measurement, calibration, and a simple mechanical load path.",
     category: "Fictional demo · Instrumentation",
+    tags: [
+      { id: "10000000-0000-4000-8000-000000000001", name: "Electronics" },
+      { id: "10000000-0000-4000-8000-000000000002", name: "In Progress" },
+    ],
     cover: "/demo/torque-sensor.jpg",
     version: 1,
     updatedAt: "2026-09-01T00:00:00.000Z",
@@ -60,6 +64,10 @@ export const demos: Article[] = [
     summary:
       "An invented notebook entry exploring insulation, temperature sensing, and a repeatable test procedure.",
     category: "Fictional demo · Test equipment",
+    tags: [
+      { id: "10000000-0000-4000-8000-000000000003", name: "Test Equipment" },
+      { id: "10000000-0000-4000-8000-000000000002", name: "In Progress" },
+    ],
     cover: "/demo/thermal-chamber.jpg",
     version: 1,
     updatedAt: "2026-08-15T00:00:00.000Z",
@@ -106,6 +114,7 @@ export const demos: Article[] = [
     summary:
       "A fictional motion-control project covering drive ratios, homing, and a clear record of design tradeoffs.",
     category: "Fictional demo · Mechanisms",
+    tags: [{ id: "10000000-0000-4000-8000-000000000004", name: "Mechanisms" }],
     cover: "/demo/camera-slider.jpg",
     version: 1,
     updatedAt: "2026-07-20T00:00:00.000Z",

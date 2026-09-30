@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import type { Post, Block } from "../../../shared/content";
 import { ArticleBody, Outline } from "../../../shared/ArticleBody";
+import TagPicker from "./TagPicker";
 const Editor = dynamic(() => import("./Editor"), {
   ssr: false,
   loading: () => <p>Loading notebook…</p>,
@@ -23,6 +24,7 @@ export default function Workspace() {
     [status, setStatus] = useState("Loading…"),
     [error, setError] = useState(""),
     [preview, setPreview] = useState(false),
+    [tagFilter, setTagFilter] = useState(""),
     [busy, setBusy] = useState(false),
     [editorKey, setEditorKey] = useState(0),
     [history, setHistory] = useState<
@@ -175,19 +177,43 @@ export default function Workspace() {
           <button className="primary" onClick={create} disabled={busy}>
             ＋ New article
           </button>
-          {posts.map((p) => (
-            <button
-              key={p.id}
-              className={post?.id === p.id ? "selected" : ""}
-              onClick={() => select(p)}
-              disabled={busy}
+          <label>
+            Filter articles by tag
+            <select
+              value={tagFilter}
+              onChange={(e) => setTagFilter(e.target.value)}
             >
-              {p.title}
-              <small>
-                {p.published ? "Published" : "Draft"} · /{p.slug}
-              </small>
-            </button>
-          ))}
+              <option value="">All articles</option>
+              {[
+                ...new Map(
+                  posts.flatMap((p) => p.tags ?? []).map((t) => [t.id, t]),
+                ).values(),
+              ]
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+            </select>
+          </label>
+          {posts
+            .filter(
+              (p) => !tagFilter || p.tags?.some((t) => t.id === tagFilter),
+            )
+            .map((p) => (
+              <button
+                key={p.id}
+                className={post?.id === p.id ? "selected" : ""}
+                onClick={() => select(p)}
+                disabled={busy}
+              >
+                {p.title}
+                <small>
+                  {p.published ? "Published" : "Draft"} · /{p.slug}
+                </small>
+              </button>
+            ))}
         </aside>
         <section>
           {post ? (
@@ -250,6 +276,14 @@ export default function Workspace() {
                   />
                 </label>
               </div>
+              <TagPicker
+                key={post.id}
+                selected={post.tags ?? []}
+                onChange={(tags) => {
+                  if (current.current?.id === post.id) change({ tags });
+                }}
+                disabled={busy}
+              />
               {history.length > 0 && (
                 <div className="revision-list">
                   {history.map((r) => (
@@ -263,6 +297,7 @@ export default function Workspace() {
                         ) {
                           change({
                             ...r.snapshot,
+                            tags: r.snapshot.tags ?? [],
                             id: post.id,
                             version: post.version,
                             published: post.published,

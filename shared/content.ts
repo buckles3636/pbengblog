@@ -28,12 +28,21 @@ export type Block = {
       };
   children?: Block[];
 };
+export type Tag = { id: string; name: string };
+export const tagNameSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(60)
+  .regex(/^[^\x00-\x1f\x7f]+$/, "Tag names cannot contain control characters");
+export const tagSchema = z.object({ id: z.uuid(), name: tagNameSchema });
 export type Article = {
   id: string;
   slug: string;
   title: string;
   summary: string;
   category: string;
+  tags?: Tag[];
   cover: string;
   blocks: Block[];
   version: number;
@@ -241,6 +250,7 @@ export const draftSchema = z.object({
   slug: slugSchema,
   summary: z.string().max(1000),
   category: z.string().max(100),
+  tags: z.array(tagSchema).max(30).default([]),
   cover: z
     .string()
     .max(4000)

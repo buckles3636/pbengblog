@@ -1,3 +1,4 @@
+import TagFilter from "../../../shared/TagFilter";
 import { posts } from "../content";
 import { site } from "../site.config";
 import { safeUrl } from "../../../shared/content";
@@ -101,36 +102,46 @@ export default function Home() {
             {String(posts.length).padStart(2, "0")} entries / Open notebook
           </span>
         </div>
-        <div className="cards">
-          {posts.map((p, index) => (
-            <a className="card" href={`/${p.slug}`} key={p.id}>
-              <div className="card-index">
-                <span>Project / {String(index + 1).padStart(2, "0")}</span>
-                <span aria-hidden="true">↗</span>
-              </div>
-              {p.cover && (
-                <div className="card-image">
-                  <img src={safeUrl(p.cover, true)} alt="" />
+        <TagFilter
+          className="cards"
+          items={posts.map((p, index) => ({
+            id: p.id,
+            tags: p.tags ?? [],
+            content: (
+              <a className="card" href={`/${p.slug}`} key={p.id}>
+                <div className="card-index">
+                  <span>Project / {String(index + 1).padStart(2, "0")}</span>
+                  <span aria-hidden="true">↗</span>
                 </div>
-              )}
-              <div className="card-copy">
-                <span className="eyebrow">{p.category}</span>
-                <h3>{p.title}</h3>
-                <p>{p.summary}</p>
-                <div className="card-foot">
-                  <span>
-                    {new Date(p.updatedAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      year: "numeric",
-                      timeZone: "UTC",
-                    })}
-                  </span>
-                  <span>Read field notes →</span>
+                {p.cover && (
+                  <div className="card-image">
+                    <img src={safeUrl(p.cover, true)} alt="" />
+                  </div>
+                )}
+                <div className="card-copy">
+                  <span className="eyebrow">{p.category}</span>
+                  <h3>{p.title}</h3>
+                  <p>{p.summary}</p>
+                  <div className="card-tags">
+                    {p.tags?.map((tag) => (
+                      <span key={tag.id}>{tag.name}</span>
+                    ))}
+                  </div>
+                  <div className="card-foot">
+                    <span>
+                      {new Date(p.updatedAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        year: "numeric",
+                        timeZone: "UTC",
+                      })}
+                    </span>
+                    <span>Read field notes →</span>
+                  </div>
                 </div>
-              </div>
-            </a>
-          ))}
-        </div>
+              </a>
+            ),
+          }))}
+        />
       </section>
     </>
   );

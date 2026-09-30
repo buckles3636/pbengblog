@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { db } from "./db";
 import { draftSchema, type Post, type Article } from "../shared/content";
+import { assignTags, postTagsSql } from "./tags";
 export class ConflictError extends Error {}
 function fromRow(row: Record<string, any>): Post {
   return {
@@ -9,6 +10,7 @@ function fromRow(row: Record<string, any>): Post {
     slug: row.slug,
     summary: row.summary,
     category: row.category,
+    tags: row.tags ?? [],
     cover: row.cover,
     blocks: row.blocks,
     version: row.version,
@@ -18,11 +20,16 @@ function fromRow(row: Record<string, any>): Post {
   };
 }
 export async function listPosts(): Promise<Post[]> {
-  const r = await db().query("SELECT * FROM posts ORDER BY updated_at DESC");
+  const r = await db().query(
+    `SELECT posts.*, ${postTagsSql} FROM posts ORDER BY updated_at DESC`,
+  );
   return r.rows.map(fromRow);
 }
 export async function getPost(id: string): Promise<Post | null> {
-  const r = await db().query("SELECT * FROM posts WHERE id = $1", [id]);
+  const r = await db().query(
+    `SELECT posts.*, ${postTagsSql} FROM posts WHERE id = $1`,
+    [id],
+  );
   return r.rows[0] ? fromRow(r.rows[0]) : null;
 }
 export async function createPost(
@@ -48,6 +55,7 @@ export async function createPost(
       ],
     );
     const post = fromRow(r.rows[0]);
+    post.tags = await assignTags(client, id, draft.tags);
     await client.query(
       "INSERT INTO revisions (post_id,version,snapshot) VALUES ($1,1,$2)",
       [id, JSON.stringify(post)],
@@ -93,6 +101,7 @@ export async function savePost(id: string, input: unknown): Promise<Post> {
         "This post changed in another tab. Reload before saving.",
       );
     const post = fromRow(r.rows[0]);
+    post.tags = await assignTags(client, id, draft.tags);
     await client.query(
       "INSERT INTO revisions (post_id,version,snapshot) VALUES ($1,$2,$3)",
       [id, post.version, JSON.stringify(post)],
@@ -110,9 +119,10 @@ export async function publishPost(id: string, version: number): Promise<Post> {
   const client = await db().connect();
   try {
     await client.query("BEGIN");
-    const r = await client.query("SELECT * FROM posts WHERE id=$1 FOR UPDATE", [
-      id,
-    ]);
+    const r = await client.query(
+      `SELECT posts.*, ${postTagsSql} FROM posts WHERE id=$1 FOR UPDATE`,
+      [id],
+    );
     if (!r.rows[0] || r.rows[0].version !== version)
       throw new ConflictError("Save the current draft before publishing.");
     const post = fromRow(r.rows[0]);
