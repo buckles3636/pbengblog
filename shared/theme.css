@@ -557,3 +557,12 @@ h4 {
 .tag-links {
   margin: 24px 0;
 }
+
+/* Long inline equations scroll within narrow article columns. */
+.inline-equation {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  vertical-align: middle;
+  padding: .15em 0;
+}
