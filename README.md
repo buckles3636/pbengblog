@@ -149,7 +149,7 @@ npm run build
 
 ## Development attribution
 
-All code in this project was generated using OpenAI Codex. Peter Buckley made all architectural and design decisions and directed the implementation.
+All code in this project was generated using OpenAI Codex. All architectural and design decisions were made by humans.  
 
 ## License
 
