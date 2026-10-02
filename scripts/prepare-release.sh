@@ -3,9 +3,11 @@ set -euo pipefail
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$project_dir"
 mkdir -p .local
-exec 9>.local/publish.lock
-flock -n 9 || { echo 'Another release is being prepared.' >&2; exit 1; }
-bash scripts/node.sh npm run publish
+if [[ "${PB_RELEASE_LOCK_HELD:-}" != 1 ]]; then
+  exec 9>.local/publish.lock
+  flock -n 9 || { echo 'Another release is running.' >&2; exit 1; }
+fi
+bash scripts/node.sh npm run publish -- "$@"
 bash scripts/node.sh npm run build:published
 bash scripts/node.sh node --input-type=module -e '
 import fs from "node:fs"; import path from "node:path"; import crypto from "node:crypto"; import {config} from "dotenv";

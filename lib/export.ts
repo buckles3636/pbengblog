@@ -5,16 +5,30 @@ import { dataDir } from "./env";
 import { db } from "./db";
 import { listPosts } from "./posts";
 import { draftSchema, type Article } from "../shared/content";
-export async function exportSnapshot(preview = false) {
+export async function exportSnapshot(preview = false, publicationId?: string) {
+  if (preview && publicationId)
+    throw new Error("Publication jobs cannot export drafts");
   // One SQL statement observes a consistent view of every published article.
   const result = await db().query(
     "SELECT published FROM posts WHERE published IS NOT NULL ORDER BY updated_at DESC",
   );
-  const articles: Article[] = preview
-    ? (await listPosts()).map(
-        ({ published: _published, notionId: _notionId, ...article }) => article,
-      )
-    : result.rows.map((r) => r.published);
+  let frozen: Article[] | undefined;
+  if (publicationId) {
+    const job = await db().query(
+      "SELECT articles FROM publication_jobs WHERE id=$1 AND state='building'",
+      [publicationId],
+    );
+    if (!job.rows[0]) throw new Error("No building publication job found");
+    frozen = job.rows[0].articles;
+  }
+  const articles: Article[] =
+    frozen ??
+    (preview
+      ? (await listPosts()).map(
+          ({ published: _published, notionId: _notionId, ...article }) =>
+            article,
+        )
+      : result.rows.map((r) => r.published));
   const slugs = new Set<string>(),
     media = new Set<string>();
   function walk(value: unknown) {
@@ -61,6 +75,7 @@ export async function exportSnapshot(preview = false) {
       {
         id,
         preview,
+        publicationId,
         createdAt: new Date().toISOString(),
         articles: articles.length,
         media: checksums,

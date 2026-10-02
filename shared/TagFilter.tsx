@@ -1,4 +1,5 @@
 "use client";
+import { tagStyle } from "./tag-colors";
 import { useEffect, useState, type ReactNode } from "react";
 import type { Tag } from "./content";
 export default function TagFilter({
@@ -49,6 +50,7 @@ export default function TagFilter({
             <button
               type="button"
               key={t.id}
+              style={tagStyle(t)}
               aria-pressed={active === t.id}
               onClick={() => select(t.id)}
             >

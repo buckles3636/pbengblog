@@ -1,0 +1,19 @@
+[Unit]
+Description=PBEngBlog background website publisher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=@PROJECT_DIR@
+ExecStart="@PROJECT_DIR@/.local/publisher-venv/bin/python" "@PROJECT_DIR@/scripts/publisher.py"
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+KillMode=mixed
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

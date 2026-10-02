@@ -7,6 +7,8 @@ root=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser()
 parser.add_argument('release')
 parser.add_argument('--production',action='store_true')
+parser.add_argument('--record-file',help='Private atomic progress record for the background publisher')
+parser.add_argument('--publication-id')
 parser.add_argument('--check',action='store_true',help='Validate the release without accessing Vercel')
 parser.add_argument('--config',default=str(root/'.local/deploy-config.json'))
 args=parser.parse_args()
@@ -17,6 +19,12 @@ actual={p.relative_to(site).as_posix():hashlib.sha256(p.read_bytes()).hexdigest(
 if actual!=expected or 'index.html' not in actual:raise SystemExit('Static release integrity check failed.')
 if args.check:
  print(f'Validated {len(actual)} static files for {manifest["articles"]} published articles.');raise SystemExit(0)
+def progress(phase, **values):
+ if args.record_file:
+  target=Path(args.record_file);target.parent.mkdir(parents=True,exist_ok=True)
+  temporary=target.with_suffix('.tmp');temporary.write_text(json.dumps({'phase':phase,**values})+'\n');temporary.chmod(0o600);temporary.replace(target)
+if args.publication_id and manifest.get('publicationId')!=args.publication_id:raise SystemExit('Publication/release mismatch')
+progress('uploading')
 config=json.loads(Path(args.config).read_text());token=Path(config['tokenFile']).read_text().strip();team=config.get('teamId')
 def call(path,body=None,raw=False,headers=None):
  url='https://api.vercel.com'+path+('?teamId='+team if team else '')
@@ -38,9 +46,12 @@ def upload(name):
  return {'file':name,'sha':digest,'size':len(data)}
 with ThreadPoolExecutor(max_workers=4) as pool:files=list(pool.map(upload,sorted(actual)))
 files.append({'file':'vercel.json','data':json.dumps({'version':2,'cleanUrls':True,'trailingSlash':False,'git':{'deploymentEnabled':False},'headers':[{'source':'/(.*)','headers':[{'key':'X-Content-Type-Options','value':'nosniff'}]}]})})
-body={'name':config['projectName'],'project':config['projectId'],'files':files,'projectSettings':{'framework':None,'buildCommand':'','installCommand':'','outputDirectory':None},'meta':{'pbengblogRelease':manifest['id']}}
+body={'name':config['projectName'],'project':config['projectId'],'files':files,'projectSettings':{'nodeVersion':'24.x','framework':None,'buildCommand':'','installCommand':'','outputDirectory':None},'meta':{'pbengblogRelease':manifest['id']}}
 if args.production:body['target']='production'
+if args.publication_id:body['meta']['pbengblogPublication']=args.publication_id
+progress('submitting')
 result=call('/v13/deployments',body)
+progress('deploying',id=result['id'],release=manifest['id'])
 record={k:result.get(k) for k in ['id','url','readyState','projectId']}
 record.update(release=manifest['id'],production=args.production,previousProduction=project.get('targets',{}).get('production',{}).get('id'))
 log=root/'.local/deployments';log.mkdir(parents=True,exist_ok=True)
@@ -49,7 +60,9 @@ print('Deployment created:',record['url'],flush=True)
 for attempt in range(60):
  status=call('/v13/deployments/'+result['id'])
  if status.get('readyState')=='READY':
-  record['readyState']='READY';(log/('production.json' if args.production else 'preview.json')).write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record));break
- if status.get('readyState') in ['ERROR','CANCELED']:raise SystemExit('Deployment failed: '+str(status.get('errorMessage','Check Vercel logs')))
+  progress('ready',id=result['id'],release=manifest['id']);record['readyState']='READY';(log/('production.json' if args.production else 'preview.json')).write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record));break
+ if status.get('readyState') in ['ERROR','CANCELED']:
+  progress('failed',id=result['id'],release=manifest['id'])
+  raise SystemExit('Deployment failed: '+str(status.get('errorMessage','Check Vercel logs')))
  time.sleep(3)
 else:raise SystemExit('Deployment still pending; check Vercel before retrying.')

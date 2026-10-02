@@ -1,3 +1,5 @@
+import { EntryDate } from "../../../shared/EntryDate";
+import { tagStyle } from "../../../shared/tag-colors";
 import TagFilter from "../../../shared/TagFilter";
 import { posts } from "../content";
 import { site } from "../site.config";
@@ -124,17 +126,11 @@ export default function Home() {
                   <p>{p.summary}</p>
                   <div className="card-tags">
                     {p.tags?.map((tag) => (
-                      <span key={tag.id}>{tag.name}</span>
+                      <span key={tag.id} style={tagStyle(tag)}>{tag.name}</span>
                     ))}
                   </div>
                   <div className="card-foot">
-                    <span>
-                      {new Date(p.updatedAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        year: "numeric",
-                        timeZone: "UTC",
-                      })}
-                    </span>
+                    <EntryDate value={p.entryDate} />
                     <span>Read field notes →</span>
                   </div>
                 </div>

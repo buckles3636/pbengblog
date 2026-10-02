@@ -566,3 +566,18 @@ h4 {
   vertical-align: middle;
   padding: .15em 0;
 }
+
+/* Shared tag colors are identical in filters, cards, articles and the editor. */
+.tag-filter button[style], .tag-links a[style], .card-tags span[style], .tag-options label[style] {
+  background: var(--tag-bg);
+  color: var(--tag-ink);
+  border-color: var(--tag-border);
+}
+.tag-filter button[style][aria-pressed="true"] {
+  box-shadow: inset 0 0 0 2px var(--tag-ink);
+  font-weight: 700;
+}
+.tag-filter button[style]:hover, .tag-links a[style]:hover {
+  border-color: var(--tag-ink);
+}
+.entry-date { font-variant-numeric: tabular-nums; }

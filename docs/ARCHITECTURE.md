@@ -30,4 +30,10 @@ The editor and database bind to loopback. Optional Vercel routing uses a separat
 
 ## Future work
 
-Automated deployment from a publish action, durable browser draft recovery after a browser crash, richer attachment conversion, publication timestamps, redirects for intentional slug changes, and automated retention policies are follow-up work. Static Vercel release scripts and verified rclone offsite backups are available in the operations guide. Five-second autosave and before-unload protection are implemented; unsaved keystrokes can still be lost if a tab crashes before saving.
+durable browser draft recovery after a browser crash, richer attachment conversion, publication timestamps, redirects for intentional slug changes, and automated retention policies are follow-up work. Static Vercel release scripts and verified rclone offsite backups are available in the operations guide. Five-second autosave and before-unload protection are implemented; unsaved keystrokes can still be lost if a tab crashes before saving.
+
+## Background publications
+
+The optional host publisher consumes durable `publication_jobs` from PostgreSQL. Enqueueing saves the selected published snapshot and freezes all published articles in one transaction. The editor only creates authenticated, same-origin jobs; it has no Docker or Vercel access. A separate single-consumer worker executes fixed build/deploy scripts, serializes with manual releases, reports heartbeats, and reconciles remote deployment receipts after interruptions. Uncertain submissions block retries pending review. See Operations for installation and recovery.
+
+`posts.entry_date` is optional editorial metadata, independent of save/revision timestamps. It preserves year, month or day precision, travels through revisions and frozen publication snapshots, and is never inferred from a recent save. Empty dates render nothing. Tag colors are derived from stable tag IDs, consistently across the editor and website.

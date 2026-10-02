@@ -13,7 +13,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <a className="brand" href="/">
             <small>PB /</small>PBEngBlog
           </a>
-          <span className="eyebrow">Private notebook</span>
+          <div className="editor-header-actions">
+            <span className="eyebrow">Private notebook</span>
+            <div id="editor-session-actions" />
+          </div>
         </header>
         <main className="shell">{children}</main>
       </body>

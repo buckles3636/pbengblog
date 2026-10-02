@@ -1,5 +1,11 @@
 "use client";
 import dynamic from "next/dynamic";
+import { createPortal } from "react-dom";
+import HistoryPanel, { type Revision } from "./HistoryPanel";
+import {
+  publicationActive,
+  type PublicationStatus,
+} from "../../../shared/publication";
 import { useEffect, useRef, useState } from "react";
 import type { Post, Block } from "../../../shared/content";
 import { ArticleBody, Outline } from "../../../shared/ArticleBody";
@@ -25,15 +31,19 @@ export default function Workspace() {
     [error, setError] = useState(""),
     [preview, setPreview] = useState(false),
     [tagFilter, setTagFilter] = useState(""),
+    [search, setSearch] = useState(""),
+    [publication, setPublication] = useState<PublicationStatus | null>(null),
+    [publicationError, setPublicationError] = useState(""),
+    [sessionActions, setSessionActions] = useState<HTMLElement | null>(null),
     [busy, setBusy] = useState(false),
     [editorKey, setEditorKey] = useState(0),
-    [history, setHistory] = useState<
-      { version: number; created_at: string; snapshot: Post }[]
-    >([]);
+    [historyOpen, setHistoryOpen] = useState(false);
   const current = useRef<Post | null>(null),
     dirty = useRef(false),
     saving = useRef(false),
-    changeCounter = useRef(0);
+    changeCounter = useRef(0),
+    publishStarting = useRef(false),
+    publishRequest = useRef<{ key: string; id: string } | null>(null);
   function select(p: Post) {
     if (
       dirty.current &&
@@ -44,7 +54,7 @@ export default function Workspace() {
     dirty.current = false;
     setPost(p);
     setPreview(false);
-    setHistory([]);
+    setHistoryOpen(false);
     setError("");
     setStatus(`Saved · revision ${p.version}`);
     setEditorKey((k) => k + 1);
@@ -118,6 +128,60 @@ export default function Workspace() {
       window.removeEventListener("beforeunload", before);
     };
   }, []);
+  async function refreshPublication() {
+    const value = (await api("/api/publications")) as PublicationStatus;
+    setPublication(value);
+    setPublicationError("");
+  }
+  useEffect(() => {
+    setSessionActions(document.getElementById("editor-session-actions"));
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout>;
+    async function poll() {
+      try {
+        const value = (await api("/api/publications")) as PublicationStatus;
+        if (!stopped) {
+          setPublication(value);
+          setPublicationError("");
+        }
+      } catch {
+        if (!stopped)
+          setPublicationError(
+            "Unable to check publishing progress. Reconnecting…",
+          );
+      }
+      if (!stopped) timer = setTimeout(poll, 4000);
+    }
+    void poll();
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
+  }, []);
+  async function restoreRevision(revision: Revision) {
+    if (
+      !current.current ||
+      !window.confirm(
+        `Restore revision ${revision.version} as a new draft? Existing revisions will be kept.`,
+      )
+    )
+      return;
+    if (dirty.current) {
+      await save();
+      if (dirty.current) return;
+    }
+    const latest = current.current;
+    change({
+      ...revision.snapshot,
+      tags: revision.snapshot.tags || [],
+      id: latest.id,
+      version: latest.version,
+      published: latest.published,
+    });
+    setEditorKey((key) => key + 1);
+    setPreview(false);
+    if (await save()) setHistoryOpen(false);
+  }
   async function logout() {
     if (dirty.current) {
       await save();
@@ -150,38 +214,124 @@ export default function Workspace() {
     }
   }
   async function publish() {
-    const p = dirty.current ? await save() : current.current;
-    if (!p || dirty.current) return;
-    setBusy(true);
+    if (publishStarting.current) return;
+    publishStarting.current = true;
     try {
-      const published = await api(`/api/posts/${p.id}/publish`, "POST", {
-        version: p.version,
-      });
-      current.current = published;
-      setPost(published);
-      setPosts((items) =>
-        items.map((item) => (item.id === p.id ? published : item)),
-      );
-      setStatus(
-        "Published snapshot saved · run npm run publish to export the website",
-      );
-    } catch (e) {
-      setError((e as Error).message);
+      const p = dirty.current ? await save() : current.current;
+      if (!p || dirty.current) return;
+      setBusy(true);
+      setError("");
+      if (publication?.enabled) {
+        const key = `${p.id}:${p.version}`;
+        if (publishRequest.current?.key !== key)
+          publishRequest.current = { key, id: crypto.randomUUID() };
+        const result = await api("/api/publications", "POST", {
+          postId: p.id,
+          version: p.version,
+          requestId: publishRequest.current.id,
+        });
+        publishRequest.current = null;
+        setPublication((value) =>
+          value ? { ...value, job: result.job } : value,
+        );
+        const { published: _published, notionId: _notionId, ...snapshot } = p;
+        if (current.current?.id === p.id) {
+          current.current = { ...current.current, published: snapshot };
+          setPost(current.current);
+        }
+        setPosts((items) =>
+          items.map((item) =>
+            item.id === p.id ? { ...item, published: snapshot } : item,
+          ),
+        );
+      } else {
+        const saved = await api(`/api/posts/${p.id}/publish`, "POST", {
+          version: p.version,
+        });
+        if (current.current?.id === p.id) {
+          current.current = { ...current.current, published: saved.published };
+          setPost(current.current);
+        }
+        setPosts((items) =>
+          items.map((item) =>
+            item.id === p.id ? { ...item, published: saved.published } : item,
+          ),
+        );
+        setStatus("Snapshot saved");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+      void refreshPublication().catch(() => {});
     } finally {
       setBusy(false);
+      publishStarting.current = false;
     }
   }
+  const filteredPosts = posts.filter((p) => {
+    const query = search.trim().toLocaleLowerCase();
+    const haystack = [
+      p.title,
+      p.summary,
+      ...(p.tags || []).map((tag) => tag.name),
+    ]
+      .join(" ")
+      .toLocaleLowerCase();
+    return (
+      (!tagFilter || p.tags?.some((tag) => tag.id === tagFilter)) &&
+      (!query || haystack.includes(query))
+    );
+  });
+  const deploymentBusy = publicationActive(publication?.job || null);
   return (
     <>
-      <div className="toolbar">
-        <span className="eyebrow">Your workspace</span>
-        <button onClick={logout} disabled={busy}>
-          Sign out
-        </button>
+      {sessionActions &&
+        createPortal(
+          <button className="sign-out" onClick={logout} disabled={busy}>
+            Sign out
+          </button>,
+          sessionActions,
+        )}
+      <div className="workspace-heading">
+        <div>
+          <p className="eyebrow">Your workspace</p>
+          <h1>Articles</h1>
+        </div>
         <span className="status" role="status">
           {status}
         </span>
       </div>
+      {publication?.enabled && (
+        <section
+          className={`publication-status publication-${publication.job?.state || "idle"}`}
+          aria-label="Website publishing"
+          aria-live="polite"
+        >
+          <div>
+            <strong>
+              {publication.job ? publication.job.message : "Ready to publish"}
+            </strong>
+            {publication.job && (
+              <span>
+                {publication.job.title} ·{" "}
+                {new Date(publication.job.created_at).toLocaleString()}
+              </span>
+            )}
+            {!publication.available && (
+              <span>The publisher is offline. Your drafts are safe.</span>
+            )}
+            {publicationError && <span>{publicationError}</span>}
+          </div>
+          {publication.siteUrl && (
+            <a
+              href={publication.siteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View website ↗
+            </a>
+          )}
+        </section>
+      )}
       {error && (
         <p className="error" role="alert">
           {error}{" "}
@@ -194,34 +344,47 @@ export default function Workspace() {
       )}
       <div className="editor-layout">
         <aside className="post-list">
-          <button className="primary" onClick={create} disabled={busy}>
-            ＋ New article
-          </button>
-          <label>
-            Filter articles by tag
-            <select
-              value={tagFilter}
-              onChange={(e) => setTagFilter(e.target.value)}
-            >
-              <option value="">All articles</option>
-              {[
-                ...new Map(
-                  posts.flatMap((p) => p.tags ?? []).map((t) => [t.id, t]),
-                ).values(),
-              ]
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-            </select>
-          </label>
-          {posts
-            .filter(
-              (p) => !tagFilter || p.tags?.some((t) => t.id === tagFilter),
-            )
-            .map((p) => (
+          <div className="sidebar-tools">
+            <button className="primary" onClick={create} disabled={busy}>
+              ＋ New article
+            </button>
+            <label className="article-search">
+              Search articles
+              <input
+                type="search"
+                placeholder="Search titles, summaries, tags…"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </label>
+            <label>
+              Tags
+              <select
+                aria-label="Filter by tag"
+                value={tagFilter}
+                onChange={(e) => setTagFilter(e.target.value)}
+              >
+                <option value="">All tags</option>
+                {[
+                  ...new Map(
+                    posts.flatMap((p) => p.tags ?? []).map((t) => [t.id, t]),
+                  ).values(),
+                ]
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          </div>
+          <p className="article-count">
+            {filteredPosts.length}{" "}
+            {filteredPosts.length === 1 ? "article" : "articles"}
+          </p>
+          <div className="article-list">
+            {filteredPosts.map((p) => (
               <button
                 key={p.id}
                 className={post?.id === p.id ? "selected" : ""}
@@ -230,10 +393,24 @@ export default function Workspace() {
               >
                 {p.title}
                 <small>
-                  {p.published ? "Published" : "Draft"} · /{p.slug}
+                  {p.published ? "Snapshot saved" : "Draft"} · /{p.slug}
                 </small>
               </button>
             ))}
+            {!filteredPosts.length && (
+              <div className="sidebar-empty">
+                <p>No articles match your search.</p>
+                <button
+                  onClick={() => {
+                    setSearch("");
+                    setTagFilter("");
+                  }}
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
+          </div>
         </aside>
         <section>
           {post ? (
@@ -245,19 +422,40 @@ export default function Workspace() {
                 <button onClick={() => setPreview((p) => !p)}>
                   {preview ? "Edit" : "Preview"}
                 </button>
-                <button onClick={publish} disabled={busy} className="primary">
-                  Publish snapshot
+                <button
+                  onClick={publish}
+                  disabled={
+                    busy ||
+                    !publication ||
+                    !!publicationError ||
+                    (publication.enabled &&
+                      (!publication.available || deploymentBusy))
+                  }
+                  className="primary"
+                >
+                  {publication?.enabled
+                    ? deploymentBusy
+                      ? "Publishing…"
+                      : "Publish to website"
+                    : "Save snapshot"}
                 </button>
                 <button
-                  onClick={() =>
-                    api(`/api/posts/${post.id}/revisions`)
-                      .then(setHistory)
-                      .catch((e) => setError(e.message))
-                  }
+                  onClick={() => setHistoryOpen((open) => !open)}
+                  aria-expanded={historyOpen}
+                  aria-controls="revision-history"
                 >
                   History
                 </button>
               </div>
+              {historyOpen && (
+                <HistoryPanel
+                  postId={post.id}
+                  version={post.version}
+                  busy={busy}
+                  onRestore={restoreRevision}
+                  onClose={() => setHistoryOpen(false)}
+                />
+              )}
               <div className="editor-meta">
                 <label className="wide">
                   Article title
@@ -279,6 +477,17 @@ export default function Workspace() {
                     value={post.category}
                     onChange={(e) => change({ category: e.target.value })}
                   />
+                </label>
+                <label className="wide">
+                  Entry date
+                  <input
+                    value={post.entryDate ?? ""}
+                    placeholder="YYYY, YYYY-MM, or YYYY-MM-DD"
+                    aria-label="Entry date"
+                    aria-describedby="entry-date-hint"
+                    onChange={(e) => change({ entryDate: e.target.value })}
+                  />
+                  <small id="entry-date-hint">When this project or entry was made, independent of later edits. Leave blank if unknown.</small>
                 </label>
                 <label className="wide">
                   Short description
@@ -304,33 +513,6 @@ export default function Workspace() {
                 }}
                 disabled={busy}
               />
-              {history.length > 0 && (
-                <div className="revision-list">
-                  {history.map((r) => (
-                    <button
-                      key={r.version}
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            `Restore revision ${r.version} into the draft? The current draft will remain in history after saving.`,
-                          )
-                        ) {
-                          change({
-                            ...r.snapshot,
-                            tags: r.snapshot.tags ?? [],
-                            id: post.id,
-                            version: post.version,
-                            published: post.published,
-                          });
-                          setEditorKey((k) => k + 1);
-                        }
-                      }}
-                    >
-                      Restore r{r.version}
-                    </button>
-                  ))}
-                </div>
-              )}
               <p className="editor-hint">
                 Paste images directly. Type / for headings, lists, and
                 equations. Autosaves every five seconds; the website controls

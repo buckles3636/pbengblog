@@ -47,6 +47,7 @@ export type Article = {
   blocks: Block[];
   version: number;
   updatedAt: string;
+  entryDate?: string;
 };
 export type Post = Article & {
   published: Article | null;
@@ -245,7 +246,14 @@ const blocksSchema = z
     };
     visit(blocks);
   });
+export const entryDateSchema = z.string().refine((value) => {
+  if (!value) return true;
+  if (!/^[1-9][0-9]{3}(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01]))?)?$/.test(value)) return false;
+  if (value.length < 10) return true;
+  return new Date(value + "T00:00:00Z").toISOString().slice(0, 10) === value;
+}, "Use a valid YYYY, YYYY-MM, or YYYY-MM-DD date.");
 export const draftSchema = z.object({
+  entryDate: entryDateSchema.default(""),
   title: z.string().trim().min(1).max(200),
   slug: slugSchema,
   summary: z.string().max(1000),

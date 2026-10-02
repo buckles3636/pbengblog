@@ -6,18 +6,18 @@ The template includes three clearly labeled fictional projects: a torque sensor,
 
 ## Homepage preview
 
-![PBEngBlog homepage with a black-and-white engineering theme and three fictional projects](docs/images/homepage.png)
+[![PBEngBlog homepage with a black-and-white engineering theme and three fictional projects](docs/images/homepage.png)](docs/images/homepage-full.png)
 
 Example photos: Antti Leppänen, Cjp24, and Tony Webster. See [photo sources and licenses](apps/web/public/demo/PHOTO-CREDITS.txt), including credits for the screenshot above.
 
 ## Architecture
 
-- **Editor:** Next.js and BlockNote, protected by single-user HTTP Basic authentication. Run privately behind HTTPS or an SSH tunnel.
+- **Editor:** Next.js and BlockNote, protected by single-owner session login. Use HTTPS for public access or an SSH tunnel for private access.
 - **Storage:** PostgreSQL 17 stores drafts, immutable revision snapshots, published snapshots, and image metadata. Image bytes live in persistent local storage.
 - **Website:** A separate Next.js static export. Publishing copies only published articles and their images into an immutable release; readers never connect to your database or editor.
 - **Migration:** A one-time importer for public `nextjs-notion-starter-kit` sites. The running blog has no Notion dependency.
 
-This is an early working foundation. The editor currently requires a separate export/build step after publishing. The included release command prepares and deploys published snapshots to Vercel. There is no multi-user management or public editor hosting configuration.
+The optional background publisher deploys to Vercel directly from the editor. A manual release command is also included. The editor supports single-owner session login and optional public HTTPS routing; see [Operations](docs/OPERATIONS.md).
 
 ## Start locally
 
@@ -41,6 +41,10 @@ For the monochrome website demo, run `npm run dev:web` and open `http://127.0.0.
 
 ## Write and publish
 
+Enable the [background publisher](docs/OPERATIONS.md#background-publishing) for **Publish to website**: save and deploy with one click, watch progress, and close the browser while the host finishes. Without it, use the manual steps below. Search titles, summaries and tags in the sidebar; **History** restores an earlier revision as a new draft. Sign out is in the header.
+
+Set an optional **Entry date** (year, month or full date) to show when a project was made independently of later edits. Tags have consistent colors across the editor and website.
+
 Use headings and blocks; the website supplies fonts, spacing, and colors. Paste PNG, JPEG, WebP, or GIF images (up to 12 MB) directly into the editor. Use `/` to insert inline or display equations.
 
 Create reusable tags in the editor, assign several to each article, and filter the article list by tag. The public project archive has tag filters with shareable URLs. Tag names are case-insensitively unique; rename them under **Manage tags**. Renames update draft labels, while published snapshots and revision history keep their saved labels until republished or restored. Each article supports up to 30 tags.
@@ -48,7 +52,7 @@ Create reusable tags in the editor, assign several to each article, and filter t
 Drafts autosave every five seconds. Saves use optimistic version checks to prevent another tab from overwriting your edits. History restores a revision into the draft; saving creates a new revision. Published URLs are permanent in this version.
 
 1. Save and preview an article.
-2. Choose **Publish snapshot** to save its published version in PostgreSQL.
+2. Choose **Save snapshot** to save its published version in PostgreSQL.
 3. Run `npm run publish` to export published content and checksum-verified media to `.local/releases/`.
 4. Run `npm run build:published` to create `apps/web/out/`.
 5. Review and deploy that output to your static host. For the complete Vercel flow, configure `.local/deploy-config.json` as described in [operations](docs/OPERATIONS.md), then use `bash scripts/release.sh --production`.

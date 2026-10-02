@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { db } from "./db";
+import type { PoolClient } from "pg";
 import { draftSchema, type Post, type Article } from "../shared/content";
 import { assignTags, postTagsSql } from "./tags";
 export class ConflictError extends Error {}
@@ -17,6 +18,7 @@ function fromRow(row: Record<string, any>): Post {
     published: row.published,
     notionId: row.notion_id,
     updatedAt: new Date(row.updated_at).toISOString(),
+    entryDate: row.entry_date ?? "",
   };
 }
 export async function listPosts(): Promise<Post[]> {
@@ -42,7 +44,7 @@ export async function createPost(
   try {
     await client.query("BEGIN");
     const r = await client.query(
-      "INSERT INTO posts (id,slug,title,summary,category,cover,blocks,notion_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *",
+      "INSERT INTO posts (id,slug,title,summary,category,cover,blocks,notion_id,entry_date) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
       [
         id,
         draft.slug,
@@ -52,6 +54,7 @@ export async function createPost(
         draft.cover,
         JSON.stringify(draft.blocks),
         notionId ?? null,
+        draft.entryDate,
       ],
     );
     const post = fromRow(r.rows[0]);
@@ -84,7 +87,7 @@ export async function savePost(id: string, input: unknown): Promise<Post> {
         "Published URLs are permanent. Keep the original slug.",
       );
     const r = await client.query(
-      "UPDATE posts SET slug=$2,title=$3,summary=$4,category=$5,cover=$6,blocks=$7,version=version+1,updated_at=now() WHERE id=$1 AND version=$8 RETURNING *",
+      "UPDATE posts SET slug=$2,title=$3,summary=$4,category=$5,cover=$6,blocks=$7,entry_date=$9,version=version+1,updated_at=now() WHERE id=$1 AND version=$8 RETURNING *",
       [
         id,
         draft.slug,
@@ -94,6 +97,7 @@ export async function savePost(id: string, input: unknown): Promise<Post> {
         draft.cover,
         JSON.stringify(draft.blocks),
         draft.version,
+        draft.entryDate,
       ],
     );
     if (!r.rows[0])
@@ -115,38 +119,47 @@ export async function savePost(id: string, input: unknown): Promise<Post> {
     client.release();
   }
 }
+export async function publishPostInTransaction(
+  client: PoolClient,
+  id: string,
+  version: number,
+): Promise<Post> {
+  const r = await client.query(
+    `SELECT posts.*, ${postTagsSql} FROM posts WHERE id=$1 FOR UPDATE`,
+    [id],
+  );
+  if (!r.rows[0] || r.rows[0].version !== version)
+    throw new ConflictError("Save the current draft before publishing.");
+  const post = fromRow(r.rows[0]);
+  const { published: _, notionId: __, ...snapshot } = post;
+  // Reject collisions with another published URL, even if its draft has been renamed.
+  const collision = await client.query(
+    "SELECT id FROM posts WHERE id<>$1 AND published->>'slug'=$2",
+    [id, post.slug],
+  );
+  if (collision.rowCount)
+    throw new ConflictError("That URL already belongs to a published post.");
+  await client.query("UPDATE posts SET published=$2 WHERE id=$1", [
+    id,
+    JSON.stringify(snapshot),
+  ]);
+  return { ...post, published: snapshot as Article };
+}
 export async function publishPost(id: string, version: number): Promise<Post> {
   const client = await db().connect();
   try {
     await client.query("BEGIN");
-    const r = await client.query(
-      `SELECT posts.*, ${postTagsSql} FROM posts WHERE id=$1 FOR UPDATE`,
-      [id],
-    );
-    if (!r.rows[0] || r.rows[0].version !== version)
-      throw new ConflictError("Save the current draft before publishing.");
-    const post = fromRow(r.rows[0]);
-    const { published: _, notionId: __, ...snapshot } = post;
-    // Reject collisions with another published URL, even if its draft has been renamed.
-    const collision = await client.query(
-      "SELECT id FROM posts WHERE id<>$1 AND published->>'slug'=$2",
-      [id, post.slug],
-    );
-    if (collision.rowCount)
-      throw new ConflictError("That URL already belongs to a published post.");
-    await client.query("UPDATE posts SET published=$2 WHERE id=$1", [
-      id,
-      JSON.stringify(snapshot),
-    ]);
+    const post = await publishPostInTransaction(client, id, version);
     await client.query("COMMIT");
-    return { ...post, published: snapshot as Article };
-  } catch (e) {
+    return post;
+  } catch (error) {
     await client.query("ROLLBACK");
-    throw e;
+    throw error;
   } finally {
     client.release();
   }
 }
+
 export async function revisions(id: string) {
   const r = await db().query(
     "SELECT version,created_at,snapshot FROM revisions WHERE post_id=$1 ORDER BY version DESC LIMIT 50",

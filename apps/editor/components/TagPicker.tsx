@@ -1,4 +1,5 @@
 "use client";
+import { tagStyle } from "../../../shared/tag-colors";
 import { useEffect, useState } from "react";
 import type { Tag } from "../../../shared/content";
 async function request(
@@ -79,7 +80,7 @@ export default function TagPicker({
       <legend>Tags</legend>
       <div className="tag-options">
         {tags.map((tag) => (
-          <label key={tag.id}>
+          <label key={tag.id} style={tagStyle(tag)}>
             <input
               type="checkbox"
               checked={selectedIds.has(tag.id)}

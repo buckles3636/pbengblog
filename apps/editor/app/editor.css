@@ -25,3 +25,225 @@
 .login-form button {
   min-height: 44px;
 }
+
+.editor-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+.sign-out {
+  font-size: 0.85rem;
+  padding: 0.45rem 0.8rem;
+}
+.workspace-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.workspace-heading h1 {
+  font-size: 1.8rem;
+  margin: 0.25rem 0 0;
+}
+.workspace-heading p {
+  margin: 0;
+}
+.editor-layout {
+  grid-template-columns: 270px minmax(0, 1fr);
+  align-items: start;
+}
+.post-list {
+  padding-right: 1.25rem;
+}
+.sidebar-tools {
+  display: grid;
+  gap: 1rem;
+}
+.sidebar-tools label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.sidebar-tools input,
+.sidebar-tools select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--line, #ddd);
+  background: var(--paper, #fff);
+  color: var(--ink, #333);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.9rem;
+}
+.article-count {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 1.25rem 0 0.5rem;
+}
+.article-list {
+  display: grid;
+  gap: 0.4rem;
+}
+.article-list > button {
+  text-align: left;
+  padding: 0.85rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+.article-list > button.selected {
+  border-color: var(--line, #ddd);
+}
+.article-list small {
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+}
+.sidebar-empty {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.publication-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--line, #ddd);
+  border-radius: 6px;
+  background: var(--paper, #fff);
+}
+.publication-status strong,
+.publication-status span {
+  display: block;
+}
+.publication-status span {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.publication-status a {
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+.publication-failed,
+.publication-needs_review {
+  border-left: 4px solid #a74332;
+}
+.publication-succeeded {
+  border-left: 4px solid #43754f;
+}
+.publication-building,
+.publication-deploying,
+.publication-queued {
+  border-left: 4px solid #777;
+}
+.history-panel {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--line, #ddd);
+  border-radius: 6px;
+}
+.panel-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.panel-heading h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+.panel-heading p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.history-items {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  max-height: 360px;
+  overflow: auto;
+}
+.history-items li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--line, #ddd);
+}
+.history-items strong,
+.history-items span {
+  display: block;
+}
+.history-items span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+.history-items button {
+  flex-shrink: 0;
+}
+@media (max-width: 900px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+  .post-list {
+    padding-right: 0;
+  }
+  .article-list {
+    max-height: 260px;
+    overflow: auto;
+  }
+  .sidebar-tools {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sidebar-tools > button {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 540px) {
+  .editor-header-actions > .eyebrow {
+    display: none;
+  }
+  .workspace-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .publication-status {
+    align-items: start;
+    flex-direction: column;
+  }
+  .sidebar-tools {
+    grid-template-columns: 1fr;
+  }
+  .history-items li {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+/* Long article URLs and tag names must not widen the mobile grid. */
+.editor-layout > *,
+.sidebar-tools > *,
+.article-list > button {
+  min-width: 0;
+}
+.article-list > button {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.article-grid > * {
+  min-width: 0;
+}
+.editing-area {
+  max-width: 100%;
+  overflow-x: auto;
+}

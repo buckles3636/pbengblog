@@ -1,3 +1,4 @@
+import { EntryDate } from "../../../../shared/EntryDate";
 import { TagLinks } from "../../../../shared/TagLinks";
 import { notFound } from "next/navigation";
 import { posts } from "../../content";
@@ -32,6 +33,7 @@ export default async function Article({
         <span className="eyebrow">{p.category}</span>
         <h1>{p.title}</h1>
         <p className="lede">{p.summary}</p>
+        <EntryDate value={p.entryDate} />
         <TagLinks tags={p.tags} />
       </header>
       <ArticleBody blocks={p.blocks} />

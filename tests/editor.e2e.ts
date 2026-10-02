@@ -119,4 +119,5 @@ test("editor saves headings and equations, pastes images, and recovers revisions
 });
 test.afterAll(async () => {
   await db().end();
+  delete (globalThis as {pbPool?: unknown}).pbPool;
 });
