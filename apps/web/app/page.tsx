@@ -20,15 +20,11 @@ export default function Home() {
         </div>
         <TagFilter
           className="cards"
-          items={posts.map((p, index) => ({
+          items={posts.map((p) => ({
             id: p.id,
             tags: p.tags ?? [],
             content: (
               <a className="card" href={`/${p.slug}`} key={p.id}>
-                <div className="card-index">
-                  <span>Project / {String(index + 1).padStart(2, "0")}</span>
-                  <span aria-hidden="true">↗</span>
-                </div>
                 {p.cover && (
                   <div className="card-image">
                     <img src={safeUrl(p.cover, true)} alt="" />
@@ -47,7 +43,7 @@ export default function Home() {
                   </div>
                   <div className="card-foot">
                     <EntryDate value={p.entryDate} />
-                    <span>Read article →</span>
+                    <span>Read article</span>
                   </div>
                 </div>
               </a>

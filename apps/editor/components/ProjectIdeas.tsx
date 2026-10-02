@@ -190,8 +190,7 @@ export default function ProjectIdeas() {
       </nav>
       <div className="workspace-heading">
         <div>
-          <p className="eyebrow">Your workspace</p>
-          <h1>Project ideas.</h1>
+          <h1>Project ideas</h1>
           <p className="workspace-intro">
             A private list for things you want to build. These never appear on
             your public blog.

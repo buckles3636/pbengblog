@@ -297,7 +297,7 @@ export default function Workspace() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View website ↗
+                View website
               </a>
             )}
             <button
@@ -329,10 +329,9 @@ export default function Workspace() {
       </nav>
       <div className="workspace-heading">
         <div>
-          <p className="eyebrow">Your workspace</p>
-          <h1>Your articles.</h1>
+          <h1>Articles</h1>
           <p className="workspace-intro">
-            Your projects, ideas, and works in progress.
+            Write, revise, and publish your projects.
           </p>
         </div>
         <span className="save-status" role="status">
@@ -353,7 +352,7 @@ export default function Workspace() {
       <div className="editor-layout">
         <aside className="post-list" aria-label="Article library">
           <div className="library-heading">
-            <h2>Your articles</h2>
+            <h2>Library</h2>
             <span>{posts.length}</span>
           </div>
           <div className="sidebar-tools">
@@ -368,7 +367,7 @@ export default function Workspace() {
               Search articles
               <input
                 type="search"
-                placeholder="Search titles, summaries, tags…"
+                placeholder="Search articles…"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
@@ -404,6 +403,7 @@ export default function Workspace() {
               <button
                 key={p.id}
                 className={post?.id === p.id ? "selected" : ""}
+                aria-pressed={post?.id === p.id}
                 onClick={() => select(p)}
                 disabled={busy || coverUploading}
               >

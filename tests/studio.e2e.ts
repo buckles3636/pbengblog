@@ -51,11 +51,18 @@ test("password-only studio uploads and removes covers, preserves failed replacem
       background: getComputedStyle(e).backgroundColor,
       scheme: getComputedStyle(e).colorScheme,
     }));
-    expect(colors).toEqual({
-      color: "rgb(23, 23, 23)",
-      background: "rgb(255, 255, 255)",
-      scheme: "light",
-    });
+    expect(colors.scheme).toBe("light");
+    const luminance = (color: string) => {
+      const rgb = color.match(/[\d.]+/g)!.slice(0, 3).map(Number).map(v => {
+        const c = v / 255;
+        return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+      });
+      return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+    };
+    const textLight = luminance(colors.color);
+    const surfaceLight = luminance(colors.background);
+    expect((Math.max(textLight, surfaceLight) + 0.05) /
+      (Math.min(textLight, surfaceLight) + 0.05)).toBeGreaterThanOrEqual(4.5);
     const chooser = page.waitForEvent("filechooser");
     await page.getByRole("button", { name: "Upload cover", exact: true }).click();
     await (await chooser).setFiles({ name: "cover.png", mimeType: "image/png", buffer: png });

@@ -23,7 +23,7 @@ test("private ideas support reusable tags, details, completion, conflicts and de
       .getByRole("button", { name: "Project ideas", exact: true })
       .click();
     await expect(
-      page.getByRole("heading", { name: "Project ideas." }),
+      page.getByRole("heading", { name: "Project ideas" }),
     ).toBeVisible();
     await page.getByLabel("Project title", { exact: true }).fill(title);
     await page

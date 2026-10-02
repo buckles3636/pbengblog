@@ -43,9 +43,8 @@ header.site-header {
   flex-shrink: 0;
 }
 .site-header nav {
-  font: 11px var(--mono);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font: 500 14px var(--sans);
+  letter-spacing: 0;
   gap: 28px;
 }
 .site-header nav a {
@@ -60,12 +59,12 @@ header.site-header {
   padding: 0 32px 56px;
 }
 .hero {
-  padding: 56px 0 44px;
+  padding: 48px 0 44px;
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--line);
 }
 .eyebrow {
-  font: 10px/1.6 var(--mono);
+  font: 13px/1.6 var(--sans);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted);
@@ -163,14 +162,15 @@ header.site-header {
   text-underline-offset: 4px;
 }
 .card p {
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1.6;
   margin: 12px 0 20px;
 }
 .card-foot {
   margin-top: auto;
   padding: 16px 0;
   border-top: 1px solid var(--line);
-  font: 10px/1.6 var(--mono);
+  font: 13px/1.6 var(--sans);
   gap: 12px;
 }
 footer {
@@ -179,7 +179,7 @@ footer {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  font: 10px/1.6 var(--mono);
+  font: 13px/1.6 var(--sans);
   margin: 0 auto;
 }
 .article-header {
@@ -230,7 +230,7 @@ footer {
   }
   .site-header nav {
     gap: 18px;
-    font-size: 10px;
+    font-size: 13px;
   }
   .shell {
     padding: 0 20px 36px;
@@ -255,3 +255,23 @@ footer {
     scroll-behavior: auto;
   }
 }
+
+/* Archive controls and reading layout. */
+.hero .eyebrow { font: 14px var(--sans); text-transform: none; letter-spacing: 0; }
+.card { border-top: 0; }
+.card .eyebrow { font: 13px var(--sans); text-transform: none; letter-spacing: 0; }
+.card-image { border: 1px solid var(--line); }
+.card h3 { font-weight: 600; line-height: 1.25; }
+.tag-filter { gap: 8px; padding-block: 8px; }
+.tag-filter button { min-height: 40px; font-size: 13px; border-radius: var(--radius); }
+.tag-filter button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.tag-result { font-size: 13px; color: var(--muted); margin: 12px 0 24px; }
+.card-tags span { font-size: 12px; }
+.prose { max-width: 72ch; }
+.outline { font: 14px/1.5 var(--sans); }
+.outline a { padding-block: 5px; }
+.entry-date { font-weight: 600; }
+@media (max-width: 600px) { .site-header nav a { padding: 12px 0; } }
+
+.card-copy .card-tags { margin-top: auto; padding-bottom: 16px; }
+.card-foot { margin-top: 0; }

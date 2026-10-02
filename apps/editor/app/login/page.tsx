@@ -3,9 +3,8 @@ export const dynamic = "force-dynamic";
 export default function LoginPage() {
   return (
     <section className="login-card">
-      <p className="eyebrow">Your notebook</p>
-      <h1>Sign in to write.</h1>
-      <p>Projects, working notes, and ideas. Pick up where you left off.</p>
+      <h1>Sign in</h1>
+      <p>Open your articles and private project ideas.</p>
       <LoginForm />
     </section>
   );

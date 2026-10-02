@@ -191,7 +191,7 @@ On HTTPS, the server issues a random HttpOnly, Secure, SameSite=Strict cookie an
 
 ## Template appearance
 
-Edit `shared/template-theme.css` to change colors, fonts, and corner radius across the public website and editor. Keep the document surface and controls legible, including tags and errors. Change website layout in `apps/web/app/monochrome.css` and editor layout in `apps/editor/app/editor.css`. The README shows the full homepage without cropping.
+Edit `shared/template-theme.css` to change colors, fonts, and corner radius across the public website and editor. Keep the document surface and controls legible, including tags and errors. Change website layout in `apps/web/app/monochrome.css` and editor layout in `apps/editor/app/editor.css`. The README shows the full homepage without cropping. Editor controls use 16px form text, keyboard focus outlines, and a skip link. Keep the plain writing surface when changing the surrounding theme; the browser test checks filter text contrast rather than a fixed palette.
 
 ## Private project ideas
 

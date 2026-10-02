@@ -49,14 +49,14 @@
 }
 .editor-app .shell {
   max-width: 1480px;
-  padding: 32px 28px 72px;
+  padding: 24px 28px 64px;
 }
 .workspace-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  margin: 0 0 28px;
+  margin: 0 0 22px;
 }
 .editor-app .eyebrow {
   color: var(--accent);
@@ -86,7 +86,7 @@
 }
 .editor-layout {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -97,7 +97,7 @@
   min-width: 0;
 }
 .post-list {
-  padding: 20px;
+  padding: 18px;
   background: var(--soft);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -130,7 +130,7 @@
   gap: 16px;
 }
 .editor-app label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
   color: var(--ink);
   gap: 7px;
@@ -144,7 +144,7 @@
   color: var(--ink);
   border-radius: var(--radius);
   padding: 11px 12px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   box-shadow: none;
@@ -277,7 +277,7 @@
 }
 .toolbar {
   gap: 8px;
-  padding: 16px 24px;
+  padding: 14px 24px;
   border-bottom: 1px solid var(--line);
   background: var(--bg);
 }
@@ -286,7 +286,7 @@
   order: 2;
 }
 .document-content {
-  padding: 28px 32px 36px;
+  padding: 28px clamp(22px, 4vw, 56px) 40px;
 }
 .article-intro {
   display: grid;
@@ -305,10 +305,8 @@
   min-height: 80px;
 }
 .cover-editor {
-  padding: 18px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  padding: 18px 0;
+  border-block: 1px solid var(--line);
   margin-bottom: 20px;
 }
 .cover-row {
@@ -368,10 +366,9 @@
   margin-top: 12px;
 }
 .article-settings {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 0 18px;
-  margin: 20px 0 28px;
+  border-bottom: 1px solid var(--line);
+  padding: 0;
+  margin: 12px 0 28px;
 }
 .article-settings > summary {
   padding: 16px 0;
@@ -406,7 +403,7 @@
 }
 .tag-picker legend {
   padding: 0 8px 0 0;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
   color: var(--ink);
 }
@@ -450,7 +447,7 @@
   color: var(--muted);
 }
 .editor-hint {
-  margin: 7px 0 22px;
+  margin: 7px 0 12px;
   font-size: 13px;
   color: var(--muted);
 }
@@ -463,7 +460,7 @@
   overflow-x: auto;
   padding: 24px 0;
   min-height: 420px;
-  border: 1px solid var(--line);
+  border: 0;
   border-radius: var(--radius);
   background: var(--surface);
 }
@@ -473,7 +470,7 @@
   font-size: 16px;
 }
 .editor-app .bn-editor {
-  padding-inline: 48px;
+  padding-inline: 40px;
   line-height: 1.75;
 }
 .editor-app .outline {
@@ -590,7 +587,7 @@
   font-size: 13px;
 }
 .login-card {
-  max-width: 460px;
+  max-width: 480px;
   margin: clamp(2rem, 8vh, 6rem) auto;
   padding: 40px;
   border: 1px solid var(--line);
@@ -726,7 +723,7 @@
     padding: 8px 10px;
   }
   .article-settings {
-    padding: 0 12px;
+    padding: 0;
   }
   .article-settings > summary small {
     display: block;
@@ -771,3 +768,38 @@
   opacity: 1;
   font-style: normal;
 }
+
+/* Keep the authoring surface quiet; use emphasis for actions and selection. */
+.editor-app .brand { min-width: 0; }
+.editor-brand-mark { flex-shrink: 0; }
+.editor-app .site-header { flex-wrap: wrap; gap: 16px; }
+.editor-app .brand > span:last-child { line-height: 1.25; }
+.editor-app .workspace-tabs { margin-bottom: 24px; }
+.editor-app .save-status { border: 1px solid var(--line); max-width: 100%; overflow-wrap: anywhere; }
+.editor-app .article-list small { display: block; }
+.editor-app .article-list > button.selected { border-color: var(--control-line); box-shadow: inset 3px 0 var(--accent); }
+.editor-app .document-content .article-intro input { border-color: transparent; padding-inline: 0; border-radius: 0; }
+.editor-app .document-content .article-intro input:hover { border-bottom-color: var(--control-line); }
+.editor-app .article-intro textarea { background: var(--surface); }
+.editor-app .editing-area:focus-within { box-shadow: inset 2px 0 var(--line); }
+.editor-app .tag-options { padding: 4px 3px; }
+.editor-app .tag-picker summary { min-height: 36px; padding-block: 8px; }
+.editor-app .outline a { padding-block: 5px; }
+.editor-app .login-card { border-top: 4px solid var(--accent); }
+.editor-app .login-card h1 { margin-top: 0; }
+.editor-app .login-form input { font-size: 16px; }
+.editor-app .skip-link { position: absolute; top: -100px; left: 16px; z-index: 100; padding: 12px 18px; background: var(--surface); }
+.editor-app .skip-link:focus { top: 12px; }
+@media (max-width: 540px) {
+  .editor-app .shell { padding-inline: 14px; }
+  .editor-app header.site-header { padding: 14px; }
+  .editor-app .workspace-tabs a, .editor-app .workspace-tabs button { min-height: 44px; padding-inline: 12px; }
+  .editor-app .cover-editor { padding-block: 16px; }
+  .editor-app .cover-row { flex-wrap: wrap; }
+  .editor-app .cover-copy { flex: 1 1 150px; }
+  .editor-app .document-content { padding: 18px 16px; }
+  .editor-app .toolbar button { min-height: 44px; }
+  .editor-app .article-settings > summary { min-height: 48px; }
+}
+
+.editor-app .outline > .eyebrow { display: block; margin-bottom: 4px; }

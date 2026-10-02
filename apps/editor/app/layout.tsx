@@ -11,6 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="editor-app">
+        <a className="skip-link" href="#main">Skip to content</a>
         <header className="site-header">
           <a className="brand" href="/">
             <span className="editor-brand-mark" aria-hidden="true">
@@ -24,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div id="editor-session-actions" />
           </div>
         </header>
-        <main className="shell">{children}</main>
+        <main id="main" className="shell">{children}</main>
       </body>
     </html>
   );
