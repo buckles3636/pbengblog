@@ -1,31 +1,38 @@
 # Migrating from Notion
 
-Keep Notion and the existing deployment available until the imported copy is reviewed. Also export the Notion root page as **Markdown & CSV**, including subpages, and retain the ZIP as an independent backup. The current importer uses public source records; ZIP import is not implemented yet.
+Keep Notion and the existing deployment available until you review the import. Export the Notion root page as **Markdown & CSV**, including subpages, and retain the ZIP as a separate backup. The importer reads public source records; it cannot import that ZIP.
 
 ```sh
 npm run import:notion -- --site https://your-existing-site.example
 npm run import:notion -- --site https://your-existing-site.example --apply
 ```
 
-The first command only inventories. `--apply` imports linked public pages as **unpublished drafts**, preserving the exact current URL slugs. `--limit 1` provides a small trial import. Pages marked non-public, unlinked pages, and unnamed records are excluded from automatic migration.
+The first command inventories the source. Add `--apply` to import linked public pages as **unpublished drafts** with their existing URL slugs. Use `--limit 1` for a trial import. The importer skips non-public pages, unlinked pages, and unnamed records.
 
-The importer archives raw public Notion blocks, inventory, original date metadata, and a conversion report under `.local/migrations/<hostname>/`. It understands both old and nested Notion record wrappers, follows pagination, and fetches missing descendant blocks. It downloads supported images into local storage, rewrites recognized internal links, and converts headings, styled text, equations, code, lists, quotes, and basic tables to BlockNote.
+Find the raw Notion blocks, inventory, original dates, and conversion report under `.local/migrations/<hostname>/`. The importer reads old and nested record wrappers, follows pagination, and fetches missing descendants. It downloads supported images, rewrites recognized internal links, and converts headings, styled text, equations, code, lists, quotes, and basic tables to BlockNote.
 
-Unsupported blocks get visible review placeholders. Callouts become quotes; embeds and non-image attachments remain links and are flagged. Missing images are flagged and left as visible placeholders. The generated jump menu replaces Notion's table-of-contents block. The importer is intentionally a one-time migration tool: its use of Notion's unofficial API is not part of normal site operation.
+Review the conversion report before publishing:
 
-Reruns skip existing source IDs and reuse downloaded images. A failed article is reported and does not replace existing content. Inspect `report.json` and the original archived blocks before publishing. Original date metadata is retained in the inventory/report; the first UI version still displays the new local update timestamp.
+- Unsupported blocks and missing images leave visible placeholders.
+- Callouts become quotes.
+- Embeds and non-image attachments remain links with review warnings.
+- The website's heading menu replaces Notion's table of contents.
+
+The importer uses Notion's unofficial API for migration. Running the blog after import requires no Notion connection. Reruns skip known source IDs and reuse downloaded images; a failed import reports the article without replacing existing content. Check `report.json` against the archived blocks. The inventory and report retain original date metadata. Set **Entry date** in the editor to show a project date instead of relying on the local save timestamp.
 
 ## Review before switching domains
 
-- Compare every public post, About, and Contact with Notion.
-- Resolve all image and unsupported-block warnings; verify equations and table structure.
-- Verify internal links and every existing URL slug.
-- Save a database/media backup and run the restore test.
-- Build and inspect the static output at desktop and mobile widths.
-- Deploy to a preview first, then switch the production domain deliberately.
+- Compare each public post, About, and Contact with Notion.
+- Resolve image and unsupported-block warnings; check equations and tables.
+- Check internal links and existing URL slugs.
+- Back up the database and media, then run the restore test.
+- Inspect a static build at desktop and mobile widths.
+- Review a preview deployment before switching the production domain.
 
-The public template must never receive `.env`, `.local`, migration archives, database dumps, or a personal site's generated media.
+Keep `.env`, `.local`, migration archives, database dumps, and personal media out of the public template.
 
 ## Existing imports: reusable tags
 
-New imports preserve Notion Tags as reusable tags. For previously imported posts, back up the database, apply migrations, then run `npx tsx scripts/import-notion-tags.ts .local/migrations/YOUR-HOST/homepage-source.json` to preview tag assignments. Add `--apply` to create the collection’s tag options and merge assignments into existing imported drafts. The backfill is idempotent, matches only existing Notion IDs, preserves article content and categories, and does not change published snapshots. Review and republish when ready.
+New imports preserve Notion Tags as reusable tags. For older imports, back up the database and apply migrations, then preview assignments with `npx tsx scripts/import-notion-tags.ts .local/migrations/YOUR-HOST/homepage-source.json`.
+
+Add `--apply` to create the collection's tag options and merge assignments into existing imported drafts. The backfill matches known Notion IDs and preserves article content, categories, and published snapshots. You can repeat it without duplicating assignments. Review the tags, then republish the affected articles.

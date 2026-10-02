@@ -1,6 +1,8 @@
 # Generated demo illustrations
 
-Generated with the built-in image_gen tool on 2026-10-02 for the fictional PBEngBlog examples. These are illustrative concepts, not photographs of completed projects or validated engineering drawings. The three PNG files replace the former reference photographs. Original generated outputs are copied unchanged into this directory.
+We used the built-in image_gen tool on October 2, 2026 to create covers for PBEngBlog's fictional projects. These concept illustrations do not document completed builds or validated engineering designs. The three PNGs replace the earlier reference photographs and retain the generated output without edits.
+
+The prompts below are the original generation records.
 
 ## Prompt set
 
