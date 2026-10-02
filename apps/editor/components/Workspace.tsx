@@ -310,6 +310,23 @@ export default function Workspace() {
           </>,
           sessionActions,
         )}
+      <nav className="workspace-tabs" aria-label="Workspace">
+        <a href="/" aria-current="page">
+          Articles
+        </a>
+        <button
+          disabled={busy || coverUploading}
+          onClick={async () => {
+            if (dirty.current) {
+              await save();
+              if (dirty.current) return;
+            }
+            window.location.href = "/ideas";
+          }}
+        >
+          Project ideas
+        </button>
+      </nav>
       <div className="workspace-heading">
         <div>
           <p className="eyebrow">Your workspace</p>

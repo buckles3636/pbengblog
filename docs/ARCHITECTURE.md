@@ -37,3 +37,7 @@ durable browser draft recovery after a browser crash, richer attachment conversi
 The optional host publisher consumes durable `publication_jobs` from PostgreSQL. Enqueueing saves the selected published snapshot and freezes all published articles in one transaction. The editor only creates authenticated, same-origin jobs; it has no Docker or Vercel access. A separate single-consumer worker executes fixed build/deploy scripts, serializes with manual releases, reports heartbeats, and reconciles remote deployment receipts after interruptions. Uncertain submissions block retries pending review. See Operations for installation and recovery.
 
 `posts.entry_date` is optional editorial metadata, independent of save/revision timestamps. It preserves year, month or day precision, travels through revisions and frozen publication snapshots, and is never inferred from a recent save. Empty dates render nothing. Tag colors are derived from stable tag IDs, consistently across the editor and website.
+
+## Private ideas
+
+Project ideas use their own PostgreSQL tables (`project_ideas`, `idea_tags`) and the existing reusable tag registry. Authenticated `/api/ideas` and `/api/ideas/[id]` routes support listing, creation, version-checked updates and deletion. Idea/tag writes are transactional; foreign keys prevent dangling tags. `/ideas` is an editor-only page. Article snapshots and both public/draft exports select posts only, so ideas cannot enter a static website release. Existing full database backups cover the new tables.

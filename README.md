@@ -60,6 +60,12 @@ See the [backend hosting guide](docs/OPERATIONS.md#backend-hosting-without-a-hom
 
 ![Editor with the same neutral styling as the website](docs/images/editor-workspace.png)
 
+## Keep a project ideas list
+
+Open **Project ideas** in the editor for projects you have not started yet. Add a title, reusable tags (Server, Hardware, Business, or your own), and optional details. Save an idea, mark it done, or filter the list by tag and status. This private list stays separate from articles and never appears on the public website. It is included in database backups.
+
+![Private project ideas list with fictional examples](docs/images/project-ideas.png)
+
 ## Deploy to Vercel
 
 Vercel hosts the public static website. Run the editor, PostgreSQL, and persistent image storage on your computer or a Linux server. The published website stays online when your editor is offline. This setup does not deploy the editor or database to Vercel.

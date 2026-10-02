@@ -1,0 +1,163 @@
+.workspace-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.workspace-tabs a,
+.workspace-tabs button {
+  font: 600 14px var(--sans);
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  text-decoration: none;
+  border-radius: 0;
+}
+.workspace-tabs [aria-current="page"] {
+  border-bottom-color: var(--accent);
+  color: var(--ink);
+}
+.workspace-tabs button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.ideas-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.idea-form,
+.ideas-list-panel {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 10px);
+  min-width: 0;
+}
+.idea-form {
+  scroll-margin-top: 20px;
+}
+.idea-form h2 {
+  margin: 0 0 20px;
+  font-size: 20px;
+}
+.idea-fields {
+  display: grid;
+  gap: 18px;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  min-width: 0;
+}
+.idea-form .tag-picker {
+  margin: 0;
+  padding-bottom: 0;
+}
+.idea-form .tag-options {
+  max-height: 200px;
+  overflow: auto;
+}
+.idea-form .tag-controls {
+  flex-wrap: wrap;
+}
+.idea-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.editor-app .idea-actions button,
+.editor-app .idea-filters button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 6px);
+  color: var(--ink);
+  background: var(--surface);
+  font-size: 14px;
+}
+.editor-app .idea-actions button.primary {
+  color: var(--on-accent, #fff);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.idea-filters {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.idea-filters label {
+  flex: 1;
+  min-width: 150px;
+}
+.ideas-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ideas-list > li {
+  display: flex;
+  gap: 14px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+.ideas-list > li > input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin: 4px 0 0;
+  accent-color: var(--accent);
+}
+.idea-content {
+  min-width: 0;
+  flex: 1;
+}
+.idea-content h2 {
+  font-size: 19px;
+  line-height: 1.4;
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+.idea-done h2 {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.idea-content .card-tags {
+  margin: 0 0 10px;
+}
+.idea-content details {
+  margin: 10px 0 14px;
+  font-size: 14px;
+}
+.idea-content summary {
+  cursor: pointer;
+}
+.idea-content details p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.idea-content .idea-actions {
+  margin-top: 12px;
+}
+.ideas-empty {
+  color: var(--muted);
+  padding: 25px 0;
+}
+@media (max-width: 850px) {
+  .ideas-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+@media (max-width: 450px) {
+  .idea-form,
+  .ideas-list-panel {
+    padding: 18px;
+  }
+  .idea-filters label {
+    min-width: 100%;
+  }
+}

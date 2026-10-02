@@ -6,7 +6,7 @@ export function apiError(e: unknown): Response {
     return Response.json({ error: e.message }, { status: e.status });
   if (e instanceof ZodError)
     return Response.json(
-      { error: "Invalid post", details: e.issues },
+      { error: "Invalid input", details: e.issues },
       { status: 400 },
     );
   if (e instanceof ConflictError)

@@ -192,3 +192,15 @@ The browser receives a random HttpOnly, Secure, SameSite=Strict session cookie o
 ## Template appearance
 
 The public website and editor share `shared/template-theme.css` for colors, fonts and corner radius. The editor keeps a light, high-contrast document surface with neutral controls; tag and error colors retain their meaning. Website layout lives in `apps/web/app/monochrome.css`, editor layout in `apps/editor/app/editor.css`. The compact homepage gives projects priority, and the README embeds an uncropped full-page screenshot.
+
+## Private project ideas
+
+Run database migration `007_project_ideas.sql` (`npm run db:migrate`) before starting this editor version. Open **Project ideas** above the article workspace, or visit `/ideas`. Add a title, optional plain-text details and reusable tags; use **Add idea** or **Save idea** to save. Unlike article drafts, idea forms save explicitly. Unsaved changes prompt before leaving.
+
+Use the checkbox to mark an idea done or reopen it, and the Show/tag filters to organize the list. Delete asks for confirmation and is permanent. Server, Hardware and Business are added as starter tags; create or rename tags through the same registry used by articles. Renames also update idea labels when reloaded. The ideas page and API require the existing owner login and same-origin writes.
+
+Ideas and assignments live in `project_ideas` and `idea_tags`, independently of posts. They are never included in public releases or draft-preview exports. Version checks reject stale edits, completion changes and deletions; copy unsaved notes before reloading after a conflict. Full database backups already include these tables and tag relationships; image backup behavior is unchanged.
+
+The isolated `tests/ideas.integration.ts` and `tests/ideas.e2e.ts` suites require a database named `publish_test`; never point them at production. They cover optimistic conflicts, tag integrity, publication exclusion, authentication, editing, completion, filtering and deletion.
+
+Project ideas review (2026-10-02): the `lib/ideas.ts` module owns input validation, tag resolution, transactional writes and version conflicts behind three functions; browser and database tests exercise that interface. Security review traced anonymous and authenticated paths through proxy/session/origin guards, parameterized SQL, strict writable fields, escaped plain-text rendering and post-only exports. No high-confidence vulnerabilities identified in the changed scope. This is a single-owner feature; no multi-user authorization model was introduced.
