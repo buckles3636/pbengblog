@@ -8,7 +8,7 @@ The template includes three clearly labeled fictional projects: a torque sensor,
 
 [![PBEngBlog homepage with a black-and-white engineering theme and three fictional projects](docs/images/homepage.png)](docs/images/homepage-full.png)
 
-Example photos: Antti Leppänen, Cjp24, and Tony Webster. See [photo sources and licenses](apps/web/public/demo/PHOTO-CREDITS.txt), including credits for the screenshot above.
+The fictional projects use generated color concept illustrations. See [image details and generation prompts](apps/web/public/demo/GENERATED-IMAGES.md).
 
 ## Architecture
 

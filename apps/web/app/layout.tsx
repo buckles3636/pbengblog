@@ -35,7 +35,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </span>
           <span>
             Built with PBEngBlog /{" "}
-            <a href="/demo/PHOTO-CREDITS.txt">Photo credits</a>
+            <a href="/demo/GENERATED-IMAGES.md">Image notes</a>
           </span>
         </footer>
       </body>

@@ -22,7 +22,7 @@ export const demos: Article[] = [
       { id: "10000000-0000-4000-8000-000000000001", name: "Electronics" },
       { id: "10000000-0000-4000-8000-000000000002", name: "In Progress" },
     ],
-    cover: "/demo/torque-sensor.jpg",
+    cover: "/demo/torque-sensor.png",
     version: 1,
     updatedAt: "2026-09-01T00:00:00.000Z",
     blocks: [
@@ -39,9 +39,9 @@ export const demos: Article[] = [
         id: "diagram",
         type: "image",
         props: {
-          url: "/demo/torque-sensor.jpg",
+          url: "/demo/torque-sensor.png",
           caption:
-            "Reference photo: Artic tram motor on a stand, by Antti Leppänen (CC BY 4.0). The fictional sensor project is not pictured.",
+            "Generated concept illustration of the fictional torque measurement fixture; not a validated mechanical design.",
         },
       },
       heading("math", "Show your work"),
@@ -68,7 +68,7 @@ export const demos: Article[] = [
       { id: "10000000-0000-4000-8000-000000000003", name: "Test Equipment" },
       { id: "10000000-0000-4000-8000-000000000002", name: "In Progress" },
     ],
-    cover: "/demo/thermal-chamber.jpg",
+    cover: "/demo/thermal-chamber.png",
     version: 1,
     updatedAt: "2026-08-15T00:00:00.000Z",
     blocks: [
@@ -85,9 +85,9 @@ export const demos: Article[] = [
         id: "chamber",
         type: "image",
         props: {
-          url: "/demo/thermal-chamber.jpg",
+          url: "/demo/thermal-chamber.png",
           caption:
-            "Reference photo: Weiss heat/cold test chamber, by Cjp24 (CC BY-SA 3.0). The fictional chamber project is not pictured.",
+            "Generated concept illustration of the fictional benchtop thermal chamber and temperature probes.",
         },
       },
       heading("model", "A first-order model"),
@@ -115,7 +115,7 @@ export const demos: Article[] = [
       "A fictional motion-control project covering drive ratios, homing, and a clear record of design tradeoffs.",
     category: "Fictional demo · Mechanisms",
     tags: [{ id: "10000000-0000-4000-8000-000000000004", name: "Mechanisms" }],
-    cover: "/demo/camera-slider.jpg",
+    cover: "/demo/camera-slider.png",
     version: 1,
     updatedAt: "2026-07-20T00:00:00.000Z",
     blocks: [
@@ -132,9 +132,9 @@ export const demos: Article[] = [
         id: "slider",
         type: "image",
         props: {
-          url: "/demo/camera-slider.jpg",
+          url: "/demo/camera-slider.png",
           caption:
-            "Reference photo: Rhino RŌV PRO Traveler camera slider, by Tony Webster (CC BY 2.0). The fictional slider project is not pictured.",
+            "Generated concept illustration of the fictional belt-driven camera slider.",
         },
       },
       heading("resolution", "Command resolution"),
