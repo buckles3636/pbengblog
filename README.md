@@ -1,6 +1,6 @@
 # PBEngBlog
 
-A standalone, self-hosted blog template with a block editor, image pasting, LaTeX equations, reusable tags, and automatic heading navigation. Write in the editor; let your website CSS handle the formatting. No Notion account or external CMS is needed.
+A standalone, self-hosted blog template with a notion-like block editor, image pasting, LaTeX equations, reusable tags, and automatic heading navigation. Write in the editor; let your website CSS handle the formatting. No Notion account or external CMS is needed.
 
 The default design is a simple black-and-white starting point. Change the name, colors, fonts, and layout to make it your own. Three fictional projects demonstrate articles, images, and equations.
 
