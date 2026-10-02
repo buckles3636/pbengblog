@@ -1,0 +1,18 @@
+/* Shared template palette. Change these values to theme the website and editor. */
+:root {
+  color-scheme: light;
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --ink: #171717;
+  --muted: #595959;
+  --line: #d4d4d4;
+  --accent: #171717;
+  --accent-hover: #333333;
+  --on-accent: #ffffff;
+  --soft: #f0f0f0;
+  --control-line: #b5b5b5;
+  --radius: 4px;
+  --sans: Arial, Helvetica, sans-serif;
+  --serif: var(--sans);
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}

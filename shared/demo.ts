@@ -14,7 +14,7 @@ export const demos: Article[] = [
   {
     id: "00000000-0000-4000-8000-000000000001",
     slug: "bench-top-torque-sensor",
-    title: "A bench-top torque sensor",
+    title: "Bench-top torque sensor",
     summary:
       "A fictional design study in strain measurement, calibration, and a simple mechanical load path.",
     category: "Fictional demo · Instrumentation",
@@ -60,7 +60,7 @@ export const demos: Article[] = [
   {
     id: "00000000-0000-4000-8000-000000000002",
     slug: "compact-thermal-test-chamber",
-    title: "A compact thermal test chamber",
+    title: "Compact thermal test chamber",
     summary:
       "An invented notebook entry exploring insulation, temperature sensing, and a repeatable test procedure.",
     category: "Fictional demo · Test equipment",
@@ -110,7 +110,7 @@ export const demos: Article[] = [
   {
     id: "00000000-0000-4000-8000-000000000003",
     slug: "precision-camera-slider",
-    title: "A precision camera slider",
+    title: "Precision camera slider",
     summary:
       "A fictional motion-control project covering drive ratios, homing, and a clear record of design tradeoffs.",
     category: "Fictional demo · Mechanisms",

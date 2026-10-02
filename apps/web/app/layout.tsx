@@ -1,4 +1,5 @@
 import "../../../shared/theme.css";
+import "../../../shared/template-theme.css";
 import "./monochrome.css";
 import { site } from "../site.config";
 import type { Metadata } from "next";

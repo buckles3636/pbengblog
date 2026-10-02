@@ -52,7 +52,7 @@ test("password-only studio uploads and removes covers, preserves failed replacem
       scheme: getComputedStyle(e).colorScheme,
     }));
     expect(colors).toEqual({
-      color: "rgb(32, 45, 61)",
+      color: "rgb(23, 23, 23)",
       background: "rgb(255, 255, 255)",
       scheme: "light",
     });

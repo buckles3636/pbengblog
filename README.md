@@ -1,90 +1,156 @@
 # PBEngBlog
 
-A self-hosted engineering blog with a Notion-style BlockNote editor, LaTeX equations, image pasting, and automatic article navigation.
+A standalone, self-hosted blog template with a block editor, image pasting, LaTeX equations, reusable tags, and automatic heading navigation. Write in the editor; let your website CSS handle the formatting. No Notion account or external CMS is needed.
 
-The template includes three clearly labeled fictional projects: a torque sensor, a thermal chamber, and a camera slider. The website uses a bold black-and-white engineering theme with an original technical drawing, numbered project cards, and readable article layouts. The editor keeps its neutral document theme. Site branding is configurable; personal content and custom themes belong in your own repository.
+The default design is a simple black-and-white starting point. Change the name, colors, fonts, and layout to make it your own. Three fictional projects demonstrate articles, images, and equations.
 
-## Homepage preview
-
-[![PBEngBlog homepage with a black-and-white engineering theme and three fictional projects](docs/images/homepage.png)](docs/images/homepage-full.png)
-
-The fictional projects use generated color concept illustrations. See [image details and generation prompts](apps/web/public/demo/GENERATED-IMAGES.md).
-
-## Architecture
-
-- **Editor:** Next.js and BlockNote, protected by single-owner session login. Use HTTPS for public access or an SSH tunnel for private access.
-- **Storage:** PostgreSQL 17 stores drafts, immutable revision snapshots, published snapshots, and image metadata. Image bytes live in persistent local storage.
-- **Website:** A separate Next.js static export. Publishing copies only published articles and their images into an immutable release; readers never connect to your database or editor.
-- **Migration:** A one-time importer for public `nextjs-notion-starter-kit` sites. The running blog has no Notion dependency.
-
-The optional background publisher deploys to Vercel directly from the editor. A manual release command is also included. The editor supports single-owner session login and optional public HTTPS routing; see [Operations](docs/OPERATIONS.md).
+[![Complete example homepage, including all three projects](docs/images/homepage-full.png)](docs/images/homepage-full.png)
 
 ## Start locally
 
-Requires Node 24+, npm, Docker, and Docker Compose.
+Use **Use this template** on GitHub to create your own repository, then clone it. Install Node.js 24+, npm, Docker, and Docker Compose.
+
+From your repository root:
 
 ```sh
 npm ci
 cp .env.example .env
-# Set unique random database and editor passwords in .env (editor: 20+ characters).
+```
+
+Edit `.env` before starting:
+
+- Set `POSTGRES_PASSWORD` and use the same password in `DATABASE_URL`. A random hexadecimal password avoids URL-encoding issues.
+- Set your own `EDITOR_PASSWORD` and an independent `EDITOR_SESSION_SECRET` (generate the session key with `openssl rand -hex 32`).
+- Set `EDITOR_ORIGIN=http://localhost:3011` and open the editor using that exact address.
+- Set `SITE_NAME`, `SITE_DESCRIPTION`, `SITE_AUTHOR`, and your eventual public `SITE_URL`.
+
+```sh
 docker compose up -d --wait db
 npm run db:migrate
-npm run db:seed
 npm run dev
 ```
 
-Open `http://127.0.0.1:3011` and sign in with the credentials in `.env`. The database binds only to `127.0.0.1:5544`. The editor binds only to `127.0.0.1:3011`.
+Open **http://localhost:3011**, sign in with your editor password, and create your first article. The database and editor listen only on this machine. Keep `.env` private and out of Git.
 
-If Node is unavailable on Linux, `bash scripts/node.sh npm ci` and `bash scripts/node.sh npm run dev` use the existing Node Docker image with your uid/gid. The helper uses host networking to reach the loopback database.
+To explore the example website in another terminal:
 
-For the monochrome website demo, run `npm run dev:web` and open `http://127.0.0.1:3012`.
+```sh
+npm run dev:web
+```
 
-## Write and publish
+Open **http://127.0.0.1:3012**. This preview shows the fictional examples; your saved articles enter the website through publishing below.
 
-Enable the [background publisher](docs/OPERATIONS.md#background-publishing) for **Publish to website**: save and deploy with one click, watch progress, and close the browser while the host finishes. Without it, use the manual steps below. Search titles, summaries and tags in the sidebar; **History** restores an earlier revision as a new draft. Sign out is in the header.
+## No home server?
 
-Set an optional **Entry date** (year, month or full date) to show when a project was made independently of later edits. Tags have consistent colors across the editor and website.
+You can run the editor and database on your own laptop and only start them when writing or publishing. The static site stays online on Vercel after your laptop shuts down. The included release helper runs on Linux (including a suitable WSL2 setup).
 
-Use headings and blocks; the website supplies fonts, spacing, and colors. Paste PNG, JPEG, WebP, or GIF images (up to 12 MB) directly into the editor. Use `/` to insert inline or display equations.
+For an always-on backend, a small cloud Linux server runs the same setup. A **Hetzner CX23** is our low-cost recommendation when available: 2 vCPUs, 4 GB RAM, and a listed EU base price of **€5.49 / US$6.49 per month**, excluding IPv4 and VAT. [Specifications](https://www.hetzner.com/cloud/cost-optimized/) · [Pricing](https://docs.hetzner.com/general/infrastructure-and-availability/price-adjustment/).
 
-Create reusable tags in the editor, assign several to each article, and filter the article list by tag. The public project archive has tag filters with shareable URLs. Tag names are case-insensitively unique; rename them under **Manage tags**. Renames update draft labels, while published snapshots and revision history keep their saved labels until republished or restored. Each article supports up to 30 tags.
+**Oracle Cloud Always Free** is a $0 alternative within its eligible compute/storage limits, but capacity can be unavailable and idle servers can be reclaimed. It is an option for patient tinkerers with offsite backups. [Oracle's limits and conditions](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm).
 
-Drafts autosave every five seconds. Saves use optimistic version checks to prevent another tab from overwriting your edits. History restores a revision into the draft; saving creates a new revision. Published URLs are permanent in this version.
+See the [backend hosting guide](docs/OPERATIONS.md#backend-hosting-without-a-home-server) for provider comparisons and a step-by-step cloud setup. Prices checked October 2, 2026; confirm the total at checkout. Vercel's free Hobby plan is intended for personal, non-commercial sites within its limits. [Hobby plan](https://vercel.com/docs/plans/hobby).
 
-1. Save and preview an article.
-2. Choose **Save snapshot** to save its published version in PostgreSQL.
-3. Run `npm run publish` to export published content and checksum-verified media to `.local/releases/`.
-4. Run `npm run build:published` to create `apps/web/out/`.
-5. Review and deploy that output to your static host. For the complete Vercel flow, configure `.local/deploy-config.json` as described in [operations](docs/OPERATIONS.md), then use `bash scripts/release.sh --production`.
+## Write and organize
 
-A normal `npm run build --workspace @pbengblog/web` builds the generic demo. It never reads private drafts. An explicit empty published snapshot builds an empty website.
+- Paste images into the document or use **Upload cover**. PNG, JPEG, WebP, and GIF up to 12 MB are supported.
+- Use `/` for headings, lists, and LaTeX equations. Headings automatically populate the article's jump menu.
+- Open **Article details** for the URL, category, reusable tags, and optional entry date. Dates accept a year, month, or full date.
+- Search and filter your article library. Drafts autosave; **History** restores earlier revisions.
+- Click **Save snapshot** when an article is ready for publication. This saves its public version; deploying it is a separate step unless you enable the background publisher.
 
-Generated releases, uploads, credentials, migration archives, and site output are ignored by Git. The public template does not contain a user's posts. Back them up separately.
+![Editor with the same neutral styling as the website](docs/images/editor-workspace.png)
 
-## Migration and operations
+## Deploy to Vercel
 
-See [migration](docs/MIGRATION.md), [operations](docs/OPERATIONS.md), and [architecture](docs/ARCHITECTURE.md).
+Vercel hosts the public static website. Run the editor, PostgreSQL, and persistent image storage on your computer or a Linux server. The published website stays online when your editor is offline. This setup does not deploy the editor or database to Vercel.
+
+The included release helper requires Linux, Docker, Python 3, and `flock`. Run it from the machine that holds your database and uploads.
+
+1. Create a Vercel project for your blog. One way to initialize it is to import your repository with the settings below; the included `vercel.json` supplies the build settings and clean article URLs. The first deployment shows the fictional demo.
+
+   | Setting | Value |
+   | --- | --- |
+   | Root directory | Repository root (`.`) |
+   | Framework preset | Other |
+   | Install command | `npm ci` |
+   | Build command | `npm run build --workspace @pbengblog/web` |
+   | Output directory | `apps/web/out` |
+   | Node.js version | 24.x |
+
+2. In Vercel's project settings, disconnect the Git repository before publishing your database content. Otherwise a later Git deployment can replace your articles with the demo. Subsequent releases use the helper below.
+3. Copy the project ID and name from project settings, and your team ID from team settings. Create a Vercel access token for that team at [account tokens](https://vercel.com/account/tokens). Store the token in a private file on your editor host, outside the repository; restrict it to your user (`chmod 600 /absolute/path/to/vercel-token`).
+4. Create the local deployment config:
+
+   ```sh
+   mkdir -p .local
+   cp docs/deploy-config.example.json .local/deploy-config.json
+   chmod 600 .env .local/deploy-config.json
+   ```
+
+   Fill in your values; `tokenFile` is a path, not the token itself:
+
+   ```json
+   {
+     "projectId": "prj_YOUR_PROJECT_ID",
+     "projectName": "your-blog",
+     "teamId": "team_YOUR_TEAM_ID",
+     "tokenFile": "/absolute/path/to/vercel-token"
+   }
+   ```
+
+5. Set `SITE_URL` in your local `.env` to the final `https://your-blog.vercel.app` address or custom domain. In the editor, click **Save snapshot** for each article you want online. At least one published article is required.
+6. Preview, review the returned URL, then publish:
+
+   ```sh
+   bash scripts/release.sh
+   bash scripts/release.sh --production
+   ```
+
+Only published snapshots and their website assets are uploaded. Unpublished edits, your database, editor password, and deployment credentials stay on your host. Branding is read from the local `.env` during release builds. Later CSS changes go live through the same release command.
+
+Add a custom domain under the Vercel project's **Domains** settings and follow its DNS instructions. See Vercel's [project documentation](https://vercel.com/docs/projects) and [build settings](https://vercel.com/docs/builds/configure-a-build) for dashboard details.
+
+For one-click **Publish to website**, follow the optional [background publisher setup](docs/OPERATIONS.md#background-publishing). For an always-running editor or an HTTPS editor domain, follow [continuous hosting](docs/OPERATIONS.md#editor-login-and-continuous-hosting). These use the same database and release process.
+
+## Make it yours
+
+| Change | File |
+| --- | --- |
+| Site name, description, author, URL | `.env` (`SITE_*`) |
+| Shared colors, fonts, and corner radius | `shared/template-theme.css` |
+| Website layout and card styling | `apps/web/app/monochrome.css` |
+| Homepage content and layout | `apps/web/app/page.tsx` |
+| Header, navigation, and footer | `apps/web/app/layout.tsx` |
+| Editor layout and controls | `apps/editor/app/editor.css` |
+| Base article/block formatting | `shared/theme.css` |
+| Fictional preview content | `shared/demo.ts` |
+
+Start with the CSS variables in `shared/template-theme.css`; both the editor and public website use them. For example, change `--accent` and `--accent-hover` for buttons, `--bg` for the page background, or `--sans` for the font. Keep foreground and background colors legible together.
+
+The demo illustrations are generated concepts. [Asset details and prompts](apps/web/public/demo/GENERATED-IMAGES.md) are included. Replace them with your own covers as you create articles. Published builds use your database snapshots, not the demo entries.
+
+## Storage and maintenance
+
+PostgreSQL stores articles, tags, revision history, and published snapshots. Uploaded image files live in `.local/uploads/`; releases live in `.local/releases/`. These are excluded from Git, so copying the repository alone does not back up your blog.
+
+```sh
+bash scripts/backup.sh
+```
+
+Keep an offsite copy of backups. See [Operations](docs/OPERATIONS.md) for restores, continuous hosting, publishing recovery, and updates; [Architecture](docs/ARCHITECTURE.md) describes the components.
+
+For development checks:
 
 ```sh
 npm run typecheck
 npm test
-npm run test:db
 npm run build
 ```
 
-The database integration test creates uniquely named temporary posts and removes only its own test records. It checks concurrent writes, revision retention, URL protection, and draft/published isolation.
+## Development attribution
+
+All code in this project was generated using OpenAI Codex. Peter Buckley made all architectural and design decisions and directed the implementation.
 
 ## License
 
-PBEngBlog application code is MIT licensed. Dependencies retain their own licenses; BlockNote core and its math package are MPL-2.0. No XL packages are required. Imported articles and media are not covered by the code license.
-
-
-## Editor login
-
-The self-hosted editor includes a login page, 12-hour sessions, and persistent login throttling. Configure your own credentials and session key, run migrations, and open `/login`. Optional HTTPS-domain deployment and continuous Docker hosting are covered in [Operations](docs/OPERATIONS.md#editor-login-and-continuous-hosting).
-
-![PBEngBlog editor login page](docs/images/editor-login.png)
-
-The editor includes direct cover-image uploads, collapsible article details, clear light-theme controls, and a password-only login. Completed publishing notifications disappear automatically; **View website** stays in the header.
-
-![Writing studio with a fictional test article](docs/images/editor-workspace.png)
+Application code is MIT licensed. Dependencies retain their own licenses; BlockNote core and its math package are MPL-2.0. No XL packages are required. Your articles and media remain separate from the application's code license.

@@ -1,0 +1,8 @@
+{
+  "framework": null,
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build --workspace @pbengblog/web",
+  "outputDirectory": "apps/web/out",
+  "cleanUrls": true,
+  "trailingSlash": false
+}

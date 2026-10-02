@@ -313,7 +313,7 @@ export default function Workspace() {
       <div className="workspace-heading">
         <div>
           <p className="eyebrow">Your workspace</p>
-          <h1>A little space to make something.</h1>
+          <h1>Your articles.</h1>
           <p className="workspace-intro">
             Your projects, ideas, and works in progress.
           </p>

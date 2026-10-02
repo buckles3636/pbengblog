@@ -1,15 +1,4 @@
-/* The writing studio owns its palette, including native controls in dark OS mode. */
-:root {
-  color-scheme: light;
-  --bg: #f3f5f7;
-  --surface: #fff;
-  --ink: #202d3d;
-  --muted: #526174;
-  --line: #d8e0e8;
-  --accent: #176b63;
-  --soft: #edf4f3;
-  --serif: var(--sans);
-}
+/* Writing studio layout; palette comes from shared/template-theme.css. */
 .editor-app {
   background: var(--bg);
   color: var(--ink);
@@ -19,7 +8,7 @@
 .editor-app header.site-header {
   max-width: none;
   padding: 18px max(28px, calc((100vw - 1480px) / 2));
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 .editor-app .brand {
@@ -34,9 +23,9 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border-radius: 12px;
-  background: #176b63;
-  color: white;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
   font-size: 23px;
   font-weight: 750;
 }
@@ -70,7 +59,7 @@
   margin: 0 0 28px;
 }
 .editor-app .eyebrow {
-  color: #176b63;
+  color: var(--accent);
   font-size: 11px;
   letter-spacing: 0.12em;
   margin: 0 0 8px;
@@ -89,9 +78,9 @@
 }
 .save-status {
   padding: 7px 12px;
-  background: #e8efed;
-  border-radius: 20px;
-  color: #31544d;
+  background: var(--soft);
+  border-radius: var(--radius);
+  color: var(--muted);
   font-size: 13px;
   flex-shrink: 0;
 }
@@ -109,9 +98,9 @@
 }
 .post-list {
   padding: 20px;
-  background: #eaf0f3;
-  border: 1px solid #d8e1e7;
-  border-radius: 16px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   position: sticky;
   top: 24px;
   max-height: calc(100vh - 48px);
@@ -131,10 +120,10 @@
 }
 .library-heading > span {
   font-size: 12px;
-  background: white;
-  border-radius: 6px;
+  background: var(--surface);
+  border-radius: var(--radius);
   padding: 2px 8px;
-  color: #526174;
+  color: var(--muted);
 }
 .sidebar-tools {
   display: grid;
@@ -143,22 +132,22 @@
 .editor-app label {
   font-size: 13px;
   font-weight: 650;
-  color: #39495d;
+  color: var(--ink);
   gap: 7px;
 }
 .editor-app
   :is(input:not([type="checkbox"]):not([type="file"]), textarea, select) {
   width: 100%;
   min-width: 0;
-  border: 1px solid #b9c6d2;
-  background: #fff;
-  color: #202d3d;
-  border-radius: 8px;
+  border: 1px solid var(--control-line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius);
   padding: 11px 12px;
   font-size: 15px;
   font-weight: 400;
   line-height: 1.5;
-  box-shadow: 0 1px 2px #182d3b05;
+  box-shadow: none;
 }
 .editor-app select {
   appearance: auto;
@@ -166,12 +155,12 @@
   padding-right: 28px;
 }
 .editor-app option {
-  color: #202d3d;
-  background: #fff;
+  color: var(--ink);
+  background: var(--surface);
 }
 .editor-app input::placeholder,
 .editor-app textarea::placeholder {
-  color: #637286;
+  color: var(--muted);
   opacity: 1;
 }
 .editor-app input:focus-visible,
@@ -180,7 +169,7 @@
 .editor-app button:focus-visible,
 .editor-app a:focus-visible,
 .editor-app summary:focus-visible {
-  outline: 3px solid #2d8275;
+  outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
 .editor-app
@@ -198,13 +187,13 @@
 .editor-app .sign-out,
 .sidebar-empty button {
   min-height: 42px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
-  border: 1px solid #c5d0db;
-  color: #26394c;
-  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--surface);
   padding: 10px 14px;
   transition:
     background 0.15s,
@@ -222,17 +211,17 @@
   )
   button:hover:not(:disabled),
 .editor-app .sign-out:hover {
-  background: #edf3f5;
-  border-color: #7c929f;
+  background: var(--soft);
+  border-color: var(--control-line);
 }
 .editor-app button.primary {
-  color: #fff;
-  background: #176b63;
-  border-color: #176b63;
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 .editor-app button.primary:hover:not(:disabled) {
-  background: #10564f;
-  border-color: #10564f;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 .editor-app button:disabled {
   opacity: 0.6;
@@ -241,11 +230,11 @@
 .editor-app .quiet-button {
   background: transparent;
   border-color: transparent;
-  color: #536174;
+  color: var(--muted);
 }
 .article-count {
   font-size: 12px;
-  color: #526174;
+  color: var(--muted);
   margin: 22px 0 10px;
 }
 .article-list {
@@ -263,17 +252,15 @@
   white-space: normal;
 }
 .editor-app .article-list > button:hover {
-  background: #f7fafb;
+  background: var(--bg);
 }
 .editor-app .article-list > button.selected {
-  background: #fff;
-  border-color: #c3d7d3;
-  box-shadow:
-    inset 3px 0 #176b63,
-    0 2px 5px #153c3510;
+  background: var(--surface);
+  border-color: var(--ink);
+  box-shadow: inset 3px 0 var(--ink);
 }
 .article-list small {
-  color: #526174;
+  color: var(--muted);
   font-size: 12px;
   font-weight: 400;
   margin-top: 6px;
@@ -282,17 +269,17 @@
   font-size: 14px;
 }
 .document-panel {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: 0 5px 20px #20304405;
+  border-radius: var(--radius);
+  box-shadow: none;
   overflow: clip;
 }
 .toolbar {
   gap: 8px;
   padding: 16px 24px;
-  border-bottom: 1px solid #e4e9ee;
-  background: #fbfcfd;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
 }
 .toolbar button.primary {
   margin-left: auto;
@@ -312,16 +299,16 @@
   letter-spacing: -0.025em;
   line-height: 1.3;
   padding: 12px 14px;
-  border-color: #d7e0e7;
+  border-color: var(--line);
 }
 .article-intro textarea {
   min-height: 80px;
 }
 .cover-editor {
   padding: 18px;
-  background: #f6f8fa;
-  border: 1px solid #e0e7ec;
-  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   margin-bottom: 20px;
 }
 .cover-row {
@@ -334,10 +321,10 @@
   height: 84px;
   display: grid;
   place-items: center;
-  border: 1px solid #d7e1e5;
-  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   overflow: hidden;
-  background: #e9f0f2;
+  background: var(--soft);
 }
 .cover-thumbnail img {
   width: 100%;
@@ -347,7 +334,7 @@
 .cover-thumbnail svg {
   width: 32px;
   height: 32px;
-  stroke: #577d80;
+  stroke: var(--muted);
   stroke-width: 1.5;
 }
 .cover-copy {
@@ -361,7 +348,7 @@
 .cover-copy p {
   margin: 3px 0 10px;
   font-size: 12px;
-  color: #526174;
+  color: var(--muted);
 }
 .cover-actions {
   display: flex;
@@ -371,7 +358,7 @@
 .cover-url {
   margin-top: 12px;
   font-size: 12px;
-  color: #46596c;
+  color: var(--muted);
 }
 .cover-url summary {
   cursor: pointer;
@@ -381,15 +368,15 @@
   margin-top: 12px;
 }
 .article-settings {
-  border: 1px solid #dce4eb;
-  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   padding: 0 18px;
   margin: 20px 0 28px;
 }
 .article-settings > summary {
   padding: 16px 0;
   cursor: pointer;
-  color: #293d4e;
+  color: var(--ink);
   font-size: 14px;
   font-weight: 650;
 }
@@ -397,7 +384,7 @@
   font-size: 12px;
   font-weight: 400;
   margin-left: 12px;
-  color: #526174;
+  color: var(--muted);
 }
 .editor-meta {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -408,11 +395,11 @@
   font-size: 12px;
   font-weight: 400;
   line-height: 1.5;
-  color: #526174;
+  color: var(--muted);
 }
 .editor-app .tag-picker {
   border: 0;
-  border-top: 1px solid #e1e7ec;
+  border-top: 1px solid var(--line);
   padding: 16px 0 20px;
   margin: 0;
   min-width: 0;
@@ -421,7 +408,7 @@
   padding: 0 8px 0 0;
   font-size: 13px;
   font-weight: 650;
-  color: #39495d;
+  color: var(--ink);
 }
 .tag-options {
   gap: 8px;
@@ -429,10 +416,10 @@
 .tag-options label {
   font-weight: 500;
   font-size: 12px;
-  border-radius: 6px;
+  border-radius: var(--radius);
 }
 .tag-options input {
-  accent-color: #176b63;
+  accent-color: var(--accent);
   width: 16px;
   height: 16px;
 }
@@ -445,7 +432,7 @@
 }
 .tag-picker summary {
   font-size: 13px;
-  color: #39495d;
+  color: var(--ink);
 }
 .writing-heading {
   display: flex;
@@ -460,12 +447,12 @@
 }
 .writing-heading span {
   font-size: 12px;
-  color: #526174;
+  color: var(--muted);
 }
 .editor-hint {
   margin: 7px 0 22px;
   font-size: 13px;
-  color: #526174;
+  color: var(--muted);
 }
 .editor-app .article-grid {
   grid-template-columns: minmax(0, 1fr);
@@ -476,13 +463,13 @@
   overflow-x: auto;
   padding: 24px 0;
   min-height: 420px;
-  border: 1px solid #e1e7ec;
-  border-radius: 10px;
-  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
 }
 .editor-app .bn-container {
-  --bn-colors-editor-background: #fff;
-  --bn-colors-editor-text: #202d3d;
+  --bn-colors-editor-background: var(--surface);
+  --bn-colors-editor-text: var(--ink);
   font-size: 16px;
 }
 .editor-app .bn-editor {
@@ -494,14 +481,14 @@
   order: 2;
   grid-row: auto;
   border: 0;
-  border-top: 1px solid #e1e7ec;
+  border-top: 1px solid var(--line);
   padding: 16px 0 0;
   font-size: 13px;
 }
 .editor-app .outline a {
   display: inline-block;
   margin: 8px 16px 0 0;
-  color: #37586a;
+  color: var(--muted);
 }
 .publication-status {
   display: flex;
@@ -511,7 +498,7 @@
   padding: 12px 18px;
   background: #e7f3ed;
   border: 1px solid #b7d6c5;
-  border-radius: 10px;
+  border-radius: var(--radius);
   margin: 0 0 20px;
   font-size: 14px;
 }
@@ -542,9 +529,9 @@
 .history-panel {
   margin: 20px 24px;
   padding: 20px;
-  background: #f5f8fa;
-  border: 1px solid #d4e0e8;
-  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
 }
 .panel-heading {
   display: flex;
@@ -559,7 +546,7 @@
 }
 .panel-heading p {
   margin: 0;
-  color: #526174;
+  color: var(--muted);
   font-size: 13px;
 }
 .history-items {
@@ -575,7 +562,7 @@
   align-items: center;
   gap: 16px;
   padding: 14px 0;
-  border-top: 1px solid #d7e1e8;
+  border-top: 1px solid var(--line);
 }
 .history-items strong {
   display: block;
@@ -583,7 +570,7 @@
 }
 .history-items span {
   display: block;
-  color: #526174;
+  color: var(--muted);
   font-size: 12px;
   margin-top: 4px;
 }
@@ -594,22 +581,22 @@
   color: #9e2e27;
   background: #fff0ee;
   border: 1px solid #edc2bc;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 12px 16px;
   font-size: 14px;
 }
 .editor-app .status {
-  color: #526174;
+  color: var(--muted);
   font-size: 13px;
 }
 .login-card {
   max-width: 460px;
   margin: clamp(2rem, 8vh, 6rem) auto;
   padding: 40px;
-  border: 1px solid #d8e1e8;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 12px 40px #24405809;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: none;
 }
 .login-card h1 {
   font-size: 32px;
@@ -618,7 +605,7 @@
   margin: 12px 0;
 }
 .login-card p {
-  color: #526174;
+  color: var(--muted);
   font-size: 15px;
 }
 .login-form {
@@ -780,7 +767,7 @@
 .editor-app
   .bn-editor
   .bn-block-content:has(.ProseMirror-trailingBreak:only-child)::after {
-  color: #637286;
+  color: var(--muted);
   opacity: 1;
   font-style: normal;
 }

@@ -1,5 +1,66 @@
 # Operations
 
+## Backend hosting without a home server
+
+The backend needs persistent PostgreSQL storage, an uploads directory, and a Linux process for the editor. A rented virtual server runs the existing Docker setup; Vercel continues serving the static public site. No application rewrite or separate managed database is required.
+
+### Choose where it runs
+
+For a small personal blog, we recommend starting with **2 vCPUs, 4 GB RAM and 40 GB disk** so local Next.js builds have room alongside the editor and database. This is a starting recommendation, not a load-tested capacity guarantee. Images and retained backups determine storage growth.
+
+| Option | Backend cost | When it fits |
+| --- | --- | --- |
+| Your existing Linux laptop or WSL2 environment | No extra hosting charge | Write locally and deploy when ready. The public site remains available while the computer is off. |
+| Hetzner CX23 in an EU region | €5.49 / US$6.49 per month base, excluding IPv4 and VAT | Recommended budget cloud option when available: 2 vCPUs, 4 GB RAM, 40 GB disk. Capacity is limited. [Plan](https://www.hetzner.com/cloud/cost-optimized/) · [Price list](https://docs.hetzner.com/general/infrastructure-and-availability/price-adjustment/). |
+| DigitalOcean Basic, regular CPU | US$24 per month for 2 vCPUs / 4 GiB / 80 GiB | A paid alternative if your preferred budget region is unavailable. The $12 / 2 GiB plan is cheaper but leaves less room for builds. [Pricing](https://www.digitalocean.com/pricing/droplets). |
+| Oracle Cloud Always Free, Ampere A1 | $0 within eligible quotas | Free option with setup and availability tradeoffs. Current documentation lists 2 OCPUs / 12 GB total and 200 GB combined boot/block storage in the home region. Free capacity can be unavailable; idle instances may be reclaimed. [Limits and conditions](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm). |
+
+Prices checked **October 2, 2026**. Taxes, backups, networking and regional availability can change the total. Trial credits are temporary and are not an ongoing free hosting plan. For Oracle, select resources explicitly marked Always Free eligible and verify the account's allocation; this repository has not been deployed or tested on Oracle ARM hardware.
+
+### Set up a cloud backend
+
+1. Create an Ubuntu 24.04 LTS server with persistent disk and an SSH key. Use a regular administrator account with sudo, such as `blog`. Allow SSH from your own IP in the provider firewall. The tunnel setup below does not require exposing ports 3011 or 5544 publicly.
+2. Install [Docker Engine and the Compose plugin](https://docs.docker.com/engine/install/ubuntu/). Give your administrator account Docker access using Docker's documented post-installation steps, then reconnect. Install the supporting tools:
+
+   ```sh
+   sudo apt update
+   sudo apt install -y git python3 python3-venv openssl util-linux
+   docker version
+   docker compose version
+   ```
+
+3. Clone **your own copy** of the template, then install dependencies using its Node 24 container:
+
+   ```sh
+   git clone https://github.com/YOUR_ACCOUNT/YOUR_BLOG.git
+   cd YOUR_BLOG
+   bash scripts/node.sh npm ci
+   cp .env.example .env
+   chmod 600 .env
+   ```
+
+4. Edit `.env` using the README's configuration instructions. Set your own database/editor credentials and session key, plus `SITE_*` branding. For the SSH-tunnel setup, use `EDITOR_ORIGIN=http://localhost:3011` and leave `EDITOR_PROXY_SECRET` unset. Start persistent storage and the production editor:
+
+   ```sh
+   docker compose up -d --wait db
+   bash scripts/node.sh npm run db:migrate
+   bash scripts/node.sh npm run build --workspace @pbengblog/editor
+   bash scripts/start-editor.sh
+   ```
+
+5. On **your laptop**, open an SSH tunnel and leave it running:
+
+   ```sh
+   ssh -N -L 3011:127.0.0.1:3011 blog@YOUR_SERVER_IP
+   ```
+
+   Open **http://localhost:3011** and sign in. Traffic between your laptop and the server travels through SSH. The editor stays running after the tunnel closes; reconnect whenever you want to write. If you prefer a public HTTPS editor domain, follow [editor hosting](#editor-login-and-continuous-hosting).
+
+6. Follow the [README Vercel setup](../README.md#deploy-to-vercel), running release commands on this cloud server. For one-click publishing, enable the [background publisher](#background-publishing) on the same server. Manual publishing does not require that service.
+7. Run `bash scripts/backup.sh` on the server and keep copies on a separate destination; see [Backups](#backups). Protect both PostgreSQL data and `.local/uploads`. Do not delete the server or its disk until you have a verified backup.
+
+The documented cloud choices are recommendations for this same self-hosted setup, not managed turnkey services. You remain responsible for OS updates and backups. A free web-app host without persistent disk cannot preserve this template's database and uploads; a free managed database alone also does not run the editor or store its image files.
+
 ## Persistent data
 
 - PostgreSQL: Compose named volume `pbengblog_postgres` by default. PostgreSQL 17; host port 5544 on loopback.
@@ -51,7 +112,7 @@ Requires Docker, Python 3, `flock`, and a Vercel project/account token. Copy `do
 
 To prepare without deployment: `bash scripts/prepare-release.sh`. Validate with `python3 scripts/deploy.py "$(cat .local/prepared-release)" --check`. Deploy that exact prepared release with the same command replacing `--check` with `--production` (or no flag for a preview). Empty sites, draft preview releases, and altered build files are rejected. Vercel previews may require account login depending on project protection settings.
 
-The release includes all published articles, never current unpublished edits. It preserves extensionless post URLs. The static deployment has no database credentials or editor routes. Keep the old Notion Git deployment disconnected after cutover so it cannot overwrite a release. When the background publisher is enabled, **Publish to website** performs the release automatically; otherwise **Save snapshot** only saves the snapshot.
+The release includes all published articles, never current unpublished edits. It preserves extensionless post URLs. The static deployment has no database credentials or editor routes. Keep automatic Git deployments disconnected so a demo build cannot overwrite published database content. When the background publisher is enabled, **Publish to website** performs the release automatically; otherwise **Save snapshot** only saves the snapshot.
 
 For rollback, open the Vercel project's Deployments page and promote the previous known-good deployment recorded in `.local/deployments/production.json` (or use Vercel's Instant Rollback). This restores the website without changing drafts or the database. Correct the draft and prepare a new release when ready.
 
@@ -127,3 +188,7 @@ Publishing progress appears only when relevant. New successes auto-dismiss after
 Login now asks only for the owner password; EDITOR_USERNAME is unused and can be removed from old environments. The password is checked server-side with a constant-time digest comparison. It is sent in a POST JSON body over the configured public HTTPS connection, not a URL, browser storage, or session cookie. The frontend contains no configured credential. Vercel terminates browser TLS and connects to the configured HTTPS Funnel upstream; the final HTTP hop is host loopback. The server/proxy necessarily handle the password during login. Keep the existing private environment file protected.
 
 The browser receives a random HttpOnly, Secure, SameSite=Strict session cookie on HTTPS; the database stores only keyed token hashes. Login throttles, origin checks, authenticated upstream routing and no-store responses remain enforced. HTTPS editor responses add a one-year HSTS policy. Password-only login changes the credential version, invalidating previous sessions once on rollout; the password itself is unchanged. Never put real credentials in screenshots, logs, tests or documentation.
+
+## Template appearance
+
+The public website and editor share `shared/template-theme.css` for colors, fonts and corner radius. The editor keeps a light, high-contrast document surface with neutral controls; tag and error colors retain their meaning. Website layout lives in `apps/web/app/monochrome.css`, editor layout in `apps/editor/app/editor.css`. The compact homepage gives projects priority, and the README embeds an uncropped full-page screenshot.

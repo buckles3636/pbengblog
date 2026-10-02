@@ -1,4 +1,5 @@
 import "../../../shared/theme.css";
+import "../../../shared/template-theme.css";
 import "./editor.css";
 import type { Metadata } from "next";
 export const metadata: Metadata = {
@@ -12,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <header className="site-header">
           <a className="brand" href="/">
             <span className="editor-brand-mark" aria-hidden="true">
-              pb.
+              +
             </span>
             <span>
               PBEngBlog<small>Your writing studio</small>
