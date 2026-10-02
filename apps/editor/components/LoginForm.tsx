@@ -13,7 +13,6 @@ export default function LoginForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: form.get("username"),
           password: form.get("password"),
         }),
       });
@@ -28,23 +27,12 @@ export default function LoginForm() {
   return (
     <form onSubmit={submit} className="login-form">
       <label>
-        Username
-        <input
-          name="username"
-          autoComplete="username"
-          autoCapitalize="none"
-          spellCheck={false}
-          required
-          maxLength={256}
-          autoFocus
-        />
-      </label>
-      <label>
         Password
         <input
           name="password"
           type="password"
           autoComplete="current-password"
+          autoFocus
           required
           maxLength={1024}
         />

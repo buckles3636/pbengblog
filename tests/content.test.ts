@@ -75,20 +75,16 @@ test("request body limits apply even without Content-Length", async () => {
   );
 });
 test("credentials accept an owner-selected password and reject invalid input", () => {
-  const user = process.env.EDITOR_USERNAME,
-    password = process.env.EDITOR_PASSWORD;
-  process.env.EDITOR_USERNAME = "test";
+  const password = process.env.EDITOR_PASSWORD;
   process.env.EDITOR_PASSWORD = "test-pass!";
   try {
-    assert.equal(credentialsMatch("test", "test-pass!"), true);
-    assert.equal(credentialsMatch("test", "wrong"), false);
-    assert.equal(credentialsMatch("wrong", "test-pass!"), false);
-    assert.equal(credentialsMatch(null, {}), false);
+    assert.equal(credentialsMatch("test-pass!"), true);
+    assert.equal(credentialsMatch("wrong"), false);
+    assert.equal(credentialsMatch(null), false);
+    assert.equal(credentialsMatch({}), false);
     process.env.EDITOR_PASSWORD = "";
-    assert.equal(credentialsMatch("test", ""), false);
+    assert.equal(credentialsMatch(""), false);
   } finally {
-    if (user === undefined) delete process.env.EDITOR_USERNAME;
-    else process.env.EDITOR_USERNAME = user;
     if (password === undefined) delete process.env.EDITOR_PASSWORD;
     else process.env.EDITOR_PASSWORD = password;
   }

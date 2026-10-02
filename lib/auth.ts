@@ -29,33 +29,23 @@ function digest(value: string) {
   return createHmac("sha256", secret()).update(value).digest("hex");
 }
 function credentialVersion() {
-  return digest(
-    JSON.stringify([process.env.EDITOR_USERNAME, process.env.EDITOR_PASSWORD]),
-  );
+  return digest(JSON.stringify(["password-only", process.env.EDITOR_PASSWORD]));
 }
-export function credentialsMatch(
-  username: unknown,
-  password: unknown,
-): boolean {
-  const expectedUser = process.env.EDITOR_USERNAME;
+export function credentialsMatch(password: unknown): boolean {
   const expectedPassword = process.env.EDITOR_PASSWORD;
   if (
-    !expectedUser ||
     !expectedPassword ||
     expectedPassword.startsWith("replace-with-") ||
-    typeof username !== "string" ||
     typeof password !== "string" ||
-    username.length > 256 ||
     password.length > 1024
   )
     return false;
   const hash = (value: string) => createHash("sha256").update(value).digest();
-  const userMatches = timingSafeEqual(hash(username), hash(expectedUser));
   const passwordMatches = timingSafeEqual(
     hash(password),
     hash(expectedPassword),
   );
-  return userMatches && passwordMatches;
+  return passwordMatches;
 }
 export function sessionToken(request: Request): string | undefined {
   const matches = (request.headers.get("cookie") || "")

@@ -20,7 +20,7 @@ The static build consumes an explicit snapshot path. No credentials, database cl
 
 ## Authentication and trust boundary
 
-The editor uses a single-owner login page and opaque random session cookies. Migration `004_editor_sessions.sql` adds sessions and login throttles to the existing PostgreSQL database. Session tokens are stored as keyed hashes, expire after 12 hours, and are revoked on logout. Credential or session-key changes invalidate existing sessions. HTTPS cookies are host-only, Secure, HttpOnly, and SameSite=Strict. Empty/unconfigured credentials fail closed; the password has no minimum length. Use a strong owner-selected password and an independent random session key.
+The editor uses a single-owner password-only login page and opaque random session cookies. Migration `004_editor_sessions.sql` adds sessions and login throttles to the existing PostgreSQL database. Session tokens are stored as keyed hashes, expire after 12 hours, and are revoked on logout. Password or session-key changes invalidate existing sessions. HTTPS cookies are host-only, Secure, HttpOnly, and SameSite=Strict. Empty/unconfigured credentials fail closed; the password has no minimum length. Use a strong owner-selected password and an independent random session key.
 
 Every article, tag, revision, publish, and upload endpoint validates its session. Write endpoints, login, and logout also require the explicitly configured `EDITOR_ORIGIN`. Authentication failures preserve the open draft and provide a sign-in link for another tab. Draft and media responses use `private, no-store`; the editor is excluded from indexing and framing. JSON bodies and uploads have streaming size limits. SVG/HTML uploads and executable URLs are rejected.
 

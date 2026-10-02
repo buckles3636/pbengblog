@@ -10,6 +10,8 @@ import { useEffect, useRef, useState } from "react";
 import type { Post, Block } from "../../../shared/content";
 import { ArticleBody, Outline } from "../../../shared/ArticleBody";
 import TagPicker from "./TagPicker";
+import CoverImage from "./CoverImage";
+import PublicationNotice from "./PublicationNotice";
 const Editor = dynamic(() => import("./Editor"), {
   ssr: false,
   loading: () => <p>Loading notebook…</p>,
@@ -36,6 +38,7 @@ export default function Workspace() {
     [publicationError, setPublicationError] = useState(""),
     [sessionActions, setSessionActions] = useState<HTMLElement | null>(null),
     [busy, setBusy] = useState(false),
+    [coverUploading, setCoverUploading] = useState(false),
     [editorKey, setEditorKey] = useState(0),
     [historyOpen, setHistoryOpen] = useState(false);
   const current = useRef<Post | null>(null),
@@ -286,52 +289,40 @@ export default function Workspace() {
     <>
       {sessionActions &&
         createPortal(
-          <button className="sign-out" onClick={logout} disabled={busy}>
-            Sign out
-          </button>,
+          <>
+            {publication?.siteUrl && (
+              <a
+                className="website-link"
+                href={publication.siteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View website ↗
+              </a>
+            )}
+            <button
+              className="sign-out"
+              onClick={logout}
+              disabled={busy || coverUploading}
+            >
+              Sign out
+            </button>
+          </>,
           sessionActions,
         )}
       <div className="workspace-heading">
         <div>
           <p className="eyebrow">Your workspace</p>
-          <h1>Articles</h1>
+          <h1>A little space to make something.</h1>
+          <p className="workspace-intro">
+            Your projects, ideas, and works in progress.
+          </p>
         </div>
-        <span className="status" role="status">
+        <span className="save-status" role="status">
           {status}
         </span>
       </div>
-      {publication?.enabled && (
-        <section
-          className={`publication-status publication-${publication.job?.state || "idle"}`}
-          aria-label="Website publishing"
-          aria-live="polite"
-        >
-          <div>
-            <strong>
-              {publication.job ? publication.job.message : "Ready to publish"}
-            </strong>
-            {publication.job && (
-              <span>
-                {publication.job.title} ·{" "}
-                {new Date(publication.job.created_at).toLocaleString()}
-              </span>
-            )}
-            {!publication.available && (
-              <span>The publisher is offline. Your drafts are safe.</span>
-            )}
-            {publicationError && <span>{publicationError}</span>}
-          </div>
-          {publication.siteUrl && (
-            <a
-              href={publication.siteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View website ↗
-            </a>
-          )}
-        </section>
-      )}
+      <PublicationNotice publication={publication} error={publicationError} />
       {error && (
         <p className="error" role="alert">
           {error}{" "}
@@ -343,9 +334,17 @@ export default function Workspace() {
         </p>
       )}
       <div className="editor-layout">
-        <aside className="post-list">
+        <aside className="post-list" aria-label="Article library">
+          <div className="library-heading">
+            <h2>Your articles</h2>
+            <span>{posts.length}</span>
+          </div>
           <div className="sidebar-tools">
-            <button className="primary" onClick={create} disabled={busy}>
+            <button
+              className="primary"
+              onClick={create}
+              disabled={busy || coverUploading}
+            >
               ＋ New article
             </button>
             <label className="article-search">
@@ -389,11 +388,16 @@ export default function Workspace() {
                 key={p.id}
                 className={post?.id === p.id ? "selected" : ""}
                 onClick={() => select(p)}
-                disabled={busy}
+                disabled={busy || coverUploading}
               >
                 {p.title}
                 <small>
-                  {p.published ? "Snapshot saved" : "Draft"} · /{p.slug}
+                  {p.published
+                    ? p.version > p.published.version
+                      ? "Unpublished changes"
+                      : "Saved"
+                    : "Draft"}
+                  {p.entryDate ? ` · ${p.entryDate}` : ""}
                 </small>
               </button>
             ))}
@@ -412,11 +416,14 @@ export default function Workspace() {
             )}
           </div>
         </aside>
-        <section>
+        <section className="document-panel">
           {post ? (
             <>
               <div className="toolbar">
-                <button onClick={() => void save()} disabled={busy}>
+                <button
+                  onClick={() => void save()}
+                  disabled={busy || coverUploading}
+                >
                   Save draft
                 </button>
                 <button onClick={() => setPreview((p) => !p)}>
@@ -426,6 +433,7 @@ export default function Workspace() {
                   onClick={publish}
                   disabled={
                     busy ||
+                    coverUploading ||
                     !publication ||
                     !!publicationError ||
                     (publication.enabled &&
@@ -451,91 +459,109 @@ export default function Workspace() {
                 <HistoryPanel
                   postId={post.id}
                   version={post.version}
-                  busy={busy}
+                  busy={busy || coverUploading}
                   onRestore={restoreRevision}
                   onClose={() => setHistoryOpen(false)}
                 />
               )}
-              <div className="editor-meta">
-                <label className="wide">
-                  Article title
-                  <input
-                    value={post.title}
-                    onChange={(e) => change({ title: e.target.value })}
-                  />
-                </label>
-                <label>
-                  URL slug
-                  <input
-                    value={post.slug}
-                    onChange={(e) => change({ slug: e.target.value })}
-                  />
-                </label>
-                <label>
-                  Category
-                  <input
-                    value={post.category}
-                    onChange={(e) => change({ category: e.target.value })}
-                  />
-                </label>
-                <label className="wide">
-                  Entry date
-                  <input
-                    value={post.entryDate ?? ""}
-                    placeholder="YYYY, YYYY-MM, or YYYY-MM-DD"
-                    aria-label="Entry date"
-                    aria-describedby="entry-date-hint"
-                    onChange={(e) => change({ entryDate: e.target.value })}
-                  />
-                  <small id="entry-date-hint">When this project or entry was made, independent of later edits. Leave blank if unknown.</small>
-                </label>
-                <label className="wide">
-                  Short description
-                  <textarea
-                    value={post.summary}
-                    onChange={(e) => change({ summary: e.target.value })}
-                  />
-                </label>
-                <label className="wide">
-                  Cover image URL
-                  <input
-                    value={post.cover}
-                    placeholder="Optional — upload an image in the article and reuse its URL"
-                    onChange={(e) => change({ cover: e.target.value })}
-                  />
-                </label>
-              </div>
-              <TagPicker
-                key={post.id}
-                selected={post.tags ?? []}
-                onChange={(tags) => {
-                  if (current.current?.id === post.id) change({ tags });
-                }}
-                disabled={busy}
-              />
-              <p className="editor-hint">
-                Paste images directly. Type / for headings, lists, and
-                equations. Autosaves every five seconds; the website controls
-                typography.
-              </p>
-              {preview ? (
-                <>
-                  <div className="preview-label">Draft preview</div>
-                  <h1>{post.title}</h1>
-                  <ArticleBody blocks={post.blocks} />
-                </>
-              ) : (
-                <div className="article-grid">
-                  <div className="editing-area">
-                    <Editor
-                      key={`${post.id}-${editorKey}`}
-                      blocks={post.blocks}
-                      onChange={(blocks: Block[]) => change({ blocks })}
+              <div className="document-content">
+                <div className="article-intro">
+                  <label className="wide">
+                    Article title
+                    <input
+                      value={post.title}
+                      onChange={(e) => change({ title: e.target.value })}
                     />
-                  </div>
-                  <Outline blocks={post.blocks} editor />
+                  </label>
+                  <label className="wide">
+                    Short description
+                    <textarea
+                      value={post.summary}
+                      onChange={(e) => change({ summary: e.target.value })}
+                    />
+                  </label>
                 </div>
-              )}
+                <CoverImage
+                  key={post.id}
+                  value={post.cover}
+                  disabled={busy}
+                  onUploading={setCoverUploading}
+                  onChange={(cover) => {
+                    if (current.current?.id === post.id) change({ cover });
+                  }}
+                />
+                <details className="article-settings">
+                  <summary>
+                    <span>Article details</span>
+                    <small>Date, URL, category & tags</small>
+                  </summary>
+                  <div className="editor-meta">
+                    <label>
+                      URL slug
+                      <input
+                        value={post.slug}
+                        onChange={(e) => change({ slug: e.target.value })}
+                      />
+                    </label>
+                    <label>
+                      Category
+                      <input
+                        value={post.category}
+                        onChange={(e) => change({ category: e.target.value })}
+                      />
+                    </label>
+                    <label className="wide">
+                      Entry date
+                      <input
+                        value={post.entryDate ?? ""}
+                        placeholder="YYYY, YYYY-MM, or YYYY-MM-DD"
+                        aria-label="Entry date"
+                        aria-describedby="entry-date-hint"
+                        onChange={(e) => change({ entryDate: e.target.value })}
+                      />
+                      <small id="entry-date-hint">
+                        When this project or entry was made, independent of
+                        later edits. Leave blank if unknown.
+                      </small>
+                    </label>
+                  </div>
+                  <TagPicker
+                    key={post.id}
+                    selected={post.tags ?? []}
+                    onChange={(tags) => {
+                      if (current.current?.id === post.id) change({ tags });
+                    }}
+                    disabled={busy || coverUploading}
+                  />
+                </details>
+                <div className="writing-heading">
+                  <h2>Write your story</h2>
+                  <span>Autosaved as you go</span>
+                </div>
+                <p className="editor-hint">
+                  Paste images directly. Type / for headings, lists, and
+                  equations. Autosaves every five seconds; the website controls
+                  typography.
+                </p>
+                {preview ? (
+                  <>
+                    <div className="preview-label">Draft preview</div>
+                    <h1>{post.title}</h1>
+                    <ArticleBody blocks={post.blocks} />
+                  </>
+                ) : (
+                  <div className="article-grid">
+                    <div className="editing-area">
+                      <Editor
+                        key={`${post.id}-${editorKey}`}
+                        blocks={post.blocks}
+                        onChange={(blocks: Block[]) => change({ blocks })}
+                      />
+                    </div>
+                    <Outline blocks={post.blocks} editor />
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <div className="empty">

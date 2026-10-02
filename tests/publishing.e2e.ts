@@ -7,7 +7,7 @@ import { demo } from "../shared/demo";
 if (!process.env.DATABASE_URL?.endsWith("/publish_test"))
   throw new Error("Use isolated publish_test database");
 const origin = process.env.EDITOR_ORIGIN!;
-test.use({actionTimeout:8000});
+test.use({ actionTimeout: 8000 });
 test("search, tag filtering, visible history, and publication progress survive reload", async ({
   page,
 }) => {
@@ -36,9 +36,6 @@ test("search, tag filtering, visible history, and publication progress survive r
     );
     await page.goto(origin + "/login");
     await page
-      .getByLabel("Username", { exact: true })
-      .fill(process.env.EDITOR_USERNAME!);
-    await page
       .getByLabel("Password", { exact: true })
       .fill(process.env.EDITOR_PASSWORD!);
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
@@ -61,7 +58,9 @@ test("search, tag filtering, visible history, and publication progress survive r
       page.getByText("No articles match your search."),
     ).toBeVisible();
     await page.getByRole("button", { name: "Clear filters" }).click();
-    await page.getByRole("combobox", { name: "Filter by tag" }).selectOption(tag.id);
+    await page
+      .getByRole("combobox", { name: "Filter by tag" })
+      .selectOption(tag.id);
     await expect(page.locator(".article-list > button")).toHaveCount(1);
     const signout = await page
       .getByRole("button", { name: "Sign out", exact: true })
@@ -78,9 +77,9 @@ test("search, tag filtering, visible history, and publication progress survive r
     await expect(
       page.getByRole("region", { name: "Revision history" }),
     ).toBeVisible();
-    await expect(page.getByRole("region", { name: "Revision history" }).getByRole("alert")).toContainText(
-      "History temporarily unavailable",
-    );
+    await expect(
+      page.getByRole("region", { name: "Revision history" }).getByRole("alert"),
+    ).toContainText("History temporarily unavailable");
     await page.getByRole("button", { name: "Close history" }).click();
     await page.unroute("**/revisions");
     await page.getByRole("button", { name: "History", exact: true }).click();
@@ -88,7 +87,10 @@ test("search, tag filtering, visible history, and publication progress survive r
       page.getByText("Revision 1 ·", { exact: false }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Close history" }).click();
-    await page.getByRole("textbox", { name: "Entry date", exact: true }).fill("2018-03-07");
+    await page.locator(".article-settings > summary").click();
+    await page
+      .getByRole("textbox", { name: "Entry date", exact: true })
+      .fill("2018-03-07");
     await page
       .getByRole("textbox", { name: "Article title" })
       .fill("Motor fixture ready for publication");
@@ -106,7 +108,9 @@ test("search, tag filtering, visible history, and publication progress survive r
     expect(job.articles.find((item: any) => item.id === post.id).title).toBe(
       "Motor fixture ready for publication",
     );
-    expect(job.articles.find((item: any) => item.id === post.id).entryDate).toBe("2018-03-07");
+    expect(
+      job.articles.find((item: any) => item.id === post.id).entryDate,
+    ).toBe("2018-03-07");
     expect(job.articles.some((item: any) => item.id === second.id)).toBe(false);
     await page.reload();
     await expect(
@@ -118,10 +122,20 @@ test("search, tag filtering, visible history, and publication progress survive r
     );
     await expect(
       page.getByRole("region", { name: "Website publishing" }),
-    ).toContainText("Published to website");
+    ).toContainText("Published to website", { timeout: 10000 });
     await expect(
       page.getByRole("button", { name: "Publish to website", exact: true }),
     ).toBeEnabled();
+    await expect(
+      page.getByRole("region", { name: "Website publishing" }),
+    ).toHaveCount(0, { timeout: 12000 });
+    await page.reload();
+    await expect(
+      page.getByRole("textbox", { name: "Article title" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Website publishing" }),
+    ).toHaveCount(0);
     await page.screenshot({
       path: ".local/publisher-editor-desktop.png",
       fullPage: true,
@@ -137,6 +151,7 @@ test("search, tag filtering, visible history, and publication progress survive r
       fullPage: true,
     });
     await page.getByRole("button", { name: "Sign out", exact: true }).click();
+    await page.waitForURL("**/login");
     expect(
       (await page.request.get(origin + "/api/publications")).status(),
     ).toBe(401);
@@ -152,5 +167,5 @@ test("search, tag filtering, visible history, and publication progress survive r
 });
 test.afterAll(async () => {
   await db().end();
-  delete (globalThis as {pbPool?: unknown}).pbPool;
+  delete (globalThis as { pbPool?: unknown }).pbPool;
 });

@@ -84,3 +84,7 @@ PBEngBlog application code is MIT licensed. Dependencies retain their own licens
 The self-hosted editor includes a login page, 12-hour sessions, and persistent login throttling. Configure your own credentials and session key, run migrations, and open `/login`. Optional HTTPS-domain deployment and continuous Docker hosting are covered in [Operations](docs/OPERATIONS.md#editor-login-and-continuous-hosting).
 
 ![PBEngBlog editor login page](docs/images/editor-login.png)
+
+The editor includes direct cover-image uploads, collapsible article details, clear light-theme controls, and a password-only login. Completed publishing notifications disappear automatically; **View website** stays in the header.
+
+![Writing studio with a fictional test article](docs/images/editor-workspace.png)

@@ -8,13 +8,17 @@ export const metadata: Metadata = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className="editor-app">
         <header className="site-header">
           <a className="brand" href="/">
-            <small>PB /</small>PBEngBlog
+            <span className="editor-brand-mark" aria-hidden="true">
+              pb.
+            </span>
+            <span>
+              PBEngBlog<small>Your writing studio</small>
+            </span>
           </a>
           <div className="editor-header-actions">
-            <span className="eyebrow">Private notebook</span>
             <div id="editor-session-actions" />
           </div>
         </header>

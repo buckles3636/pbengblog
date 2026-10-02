@@ -13,7 +13,6 @@ import {
 if (!process.env.DATABASE_URL?.endsWith("/auth_test"))
   throw new Error("Use the isolated auth_test database");
 process.env.EDITOR_ORIGIN = "https://editor.example.com";
-process.env.EDITOR_USERNAME = "test";
 process.env.EDITOR_PASSWORD = "short-test!";
 process.env.EDITOR_SESSION_SECRET =
   "independent-test-session-secret-32-characters";

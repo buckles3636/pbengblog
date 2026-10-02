@@ -62,7 +62,7 @@ Download one dated backup folder with `rclone copy REMOTE:FOLDER/DATED-BACKUP .l
 
 ## Editor login and continuous hosting
 
-Set `EDITOR_USERNAME`, a nonempty `EDITOR_PASSWORD`, and `EDITOR_SESSION_SECRET` in the ignored `.env` (0600). Generate the session key with `openssl rand -hex 32`; it must contain at least 32 characters and be independent of the password. Set `EDITOR_ORIGIN` to the exact browser origin, such as `http://localhost:3011` for a local editor or `https://edit.example.com` for HTTPS. HTTP Basic authentication is no longer supported. Run migrations before starting this version.
+Set a nonempty `EDITOR_PASSWORD` and `EDITOR_SESSION_SECRET` in the ignored `.env` (0600). Generate the session key with `openssl rand -hex 32`; it must contain at least 32 characters and be independent of the password. Set `EDITOR_ORIGIN` to the exact browser origin, such as `http://localhost:3011` for a local editor or `https://edit.example.com` for HTTPS. HTTP Basic authentication is no longer supported. Run migrations before starting this version.
 
 ```sh
 bash scripts/node.sh npm run db:migrate
@@ -117,3 +117,13 @@ Search matches article titles, summaries and tag names; combine it with the tag 
 Set **Entry date** in the editor using `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`. Leave it empty if unknown. Apply migration `006_entry_dates.sql` before running this editor. Publish to display the date on the homepage and article; editing a post later does not change its entry date. Existing articles remain undated until the owner fills in dates. Tag badges use consistent colors derived from tag IDs, with text and visible selection outlines.
 
 The release script explicitly selects Node 24 for Vercel deployments, matching the local toolchain. See [Vercel Node versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions). An inherited obsolete project runtime can otherwise reject even a static-file release.
+
+## Writing studio and password-only login
+
+The editor uses a consistent light palette independent of the operating-system theme. Article details (date, URL, category and tags) are collapsible; the title, summary, cover and writing area remain visible. Upload or replace the cover directly using **Upload cover**/**Replace cover**, or expand **Use an image URL**. Uploads use the same authenticated, size-limited image endpoint as inline images. PNG, JPEG, WebP and GIF up to 12 MB are supported. Failed replacement preserves the existing cover; removal only clears the article reference, retaining the file for older revisions. Save/publish/navigation controls wait for an in-flight cover upload.
+
+Publishing progress appears only when relevant. New successes auto-dismiss after ten seconds and can be dismissed immediately; reopening the editor does not redisplay an old success. Failed, active, uncertain or offline states remain visible as appropriate. **View website** is always available in the header when SITE_URL is configured.
+
+Login now asks only for the owner password; EDITOR_USERNAME is unused and can be removed from old environments. The password is checked server-side with a constant-time digest comparison. It is sent in a POST JSON body over the configured public HTTPS connection, not a URL, browser storage, or session cookie. The frontend contains no configured credential. Vercel terminates browser TLS and connects to the configured HTTPS Funnel upstream; the final HTTP hop is host loopback. The server/proxy necessarily handle the password during login. Keep the existing private environment file protected.
+
+The browser receives a random HttpOnly, Secure, SameSite=Strict session cookie on HTTPS; the database stores only keyed token hashes. Login throttles, origin checks, authenticated upstream routing and no-store responses remain enforced. HTTPS editor responses add a one-year HSTS policy. Password-only login changes the credential version, invalidating previous sessions once on rollout; the password itself is unchanged. Never put real credentials in screenshots, logs, tests or documentation.

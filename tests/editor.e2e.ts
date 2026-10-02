@@ -6,9 +6,6 @@ const origin = process.env.EDITOR_ORIGIN || "http://localhost:3011";
 test.beforeEach(async ({ page }) => {
   await page.goto(`${origin}/login`);
   await page
-    .getByLabel("Username", { exact: true })
-    .fill(process.env.EDITOR_USERNAME!);
-  await page
     .getByLabel("Password", { exact: true })
     .fill(process.env.EDITOR_PASSWORD!);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();

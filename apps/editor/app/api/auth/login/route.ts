@@ -38,8 +38,8 @@ export async function POST(request: Request) {
         error instanceof HttpError ? error.status : 400,
       );
     }
-    if (!credentialsMatch(body?.username, body?.password))
-      return authError("Incorrect username or password", 401);
+    if (!credentialsMatch(body?.password))
+      return authError("Incorrect password", 401);
     const token = await createSession();
     return Response.json(
       { ok: true },
